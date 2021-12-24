@@ -96,7 +96,7 @@ namespace Recurrent{
     * Non-destructive elementwise sigmoid
     * @param m 
     */
-    public Matsig(Mat m) {
+    public Mat sig(Mat m) {
       Mat matOut = MatOps.sig(m);
       this.addSigmoidToBackpropagationStack(m, matOut);
       return matOut;
