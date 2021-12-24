@@ -108,24 +108,28 @@ namespace Reinforce{
         * Transforms Agent to (ready-to-stringify) JSON object
         */
         public string toJSON(){
+            /*
             const j = {
             ns: this.numberOfStates,
             nh: this.numberOfHiddenUnits,
             na: this.numberOfActions,
             net: Net.toJSON(this.net)
             };
-            return j;
+            return j;*/
+            return "";
         }
 
         /**
         * Loads an Agent from a (already parsed) JSON object
         * @param json with properties `nh`, `ns`, `na` and `net`
         */
-        public void fromJSON(string json: { ns, nh, na, net }) {
+        public void fromJSON(string json) { //: { ns, nh, na, net }
+            /*
             this.numberOfStates = json.ns;
             this.numberOfHiddenUnits = json.nh;
             this.numberOfActions = json.na;
             this.net = Net.fromJSON(json.net);
+            */
         }
 
         /**
@@ -152,7 +156,7 @@ namespace Reinforce{
                 actionIndex = Utils.randi(0, this.numberOfActions);
             } else {
             // Q function
-                const actionVector = this.forwardQ(stateVector);
+                Mat actionVector = this.forwardQ(stateVector);
                 actionIndex = Utils.argmax(actionVector.w); // returns index of argmax action 
             }
             return actionIndex;
@@ -178,9 +182,9 @@ namespace Reinforce{
         * @param stateVector Matrix with states
         * @return Matrix (Vector) with predicted actions values
         */
-        protected Mat forwardQ(stateVector: Mat | null) {
-            const graph = new Graph();  // without backprop option
-            const a2Mat = this.determineActionVector(graph, stateVector);
+        protected Mat forwardQ(Mat? stateVector) {
+            Graph graph = new Graph();  // without backprop option
+            Mat a2Mat = this.determineActionVector(graph, stateVector);
             return a2Mat;
         }
 
@@ -189,21 +193,21 @@ namespace Reinforce{
         * @param stateVector Matrix with states
         * @return Matrix (Vector) with predicted actions values
         */
-        protected Mat backwardQ(stateVector: Mat | null) {
-            const graph = new Graph();
+        protected Mat backwardQ(Mat? stateVector) {
+            Graph graph = new Graph();
             graph.memorizeOperationSequence(true);  // with backprop option
-            const a2Mat = this.determineActionVector(graph, stateVector);
+            Mat a2Mat = this.determineActionVector(graph, stateVector);
             return a2Mat;
         }
 
 
-        protected Mat determineActionVector(graph: Graph, stateVector: Mat) {
-            const a2mat = this.net.forward(stateVector, graph);
+        protected Mat determineActionVector(Graph graph, Mat stateVector ) {
+            Mat a2mat = this.net.forward(stateVector, graph);
             this.backupGraph(graph); // back this up
             return a2mat;
         }
 
-        protected void backupGraph(graph: Graph) {
+        protected void backupGraph(Graph graph) {
             this.previousGraph = graph;
         }
 
@@ -259,11 +263,11 @@ namespace Reinforce{
             this.net.update(this.alpha);
         }
 
-        protected float getTargetQ(Mat s1: , float r0) {
+        protected float getTargetQ(Mat s1 , float r0) {
             // want: Q(s,a) = r + gamma * max_a' Q(s',a')
-            const targetActionVector = this.forwardQ(s1);
-            const targetActionIndex = Utils.argmax(targetActionVector.w);
-            const qMax = r0 + this.gamma * targetActionVector.w[targetActionIndex];
+            Mat targetActionVector = this.forwardQ(s1);
+            int targetActionIndex = Utils.argmax(targetActionVector.w);
+            float qMax = r0 + this.gamma * targetActionVector.w[targetActionIndex];
             return qMax;
         }
 
@@ -291,7 +295,7 @@ namespace Reinforce{
         }
 
         protected void addShortTermToLongTermMemory() {
-            const sarsa = this.extractSarsaExperience();
+            SarsaExperience sarsa = this.extractSarsaExperience();
             this.longTermMemory[this.memoryIndexTick] = sarsa;
             this.memoryIndexTick++;
             if (this.memoryIndexTick > this.experienceSize - 1) { // roll over
@@ -300,11 +304,11 @@ namespace Reinforce{
         }
 
         protected SarsaExperience extractSarsaExperience() {
-            const s0 = new Mat(this.shortTermMemory.s0.rows, this.shortTermMemory.s0.cols);
+            Mat s0 = new Mat(this.shortTermMemory.s0.rows, this.shortTermMemory.s0.cols);
             s0.setFrom(this.shortTermMemory.s0.w);
-            const s1 = new Mat(this.shortTermMemory.s1.rows, this.shortTermMemory.s1.cols);
+            Mat s1 = new Mat(this.shortTermMemory.s1.rows, this.shortTermMemory.s1.cols);
             s1.setFrom(this.shortTermMemory.s1.w);
-            const sarsa = {
+            SarsaExperience sarsa = {
                 s0,
                 a0: this.shortTermMemory.a0,
                 r0: this.shortTermMemory.r0,
@@ -318,10 +322,10 @@ namespace Reinforce{
         * Sample some additional experience (minibatches) from replay memory and learn from it
         */
         protected void limitedSampledReplayLearning() {
-            for (let i = 0; i < this.replaySteps; i++) {
-            const ri = Utils.randi(0, this.longTermMemory.length); // todo: priority sweeps?
-            const sarsa = this.longTermMemory[ri];
-            this.learnFromSarsaTuple(sarsa);
+            for (int i = 0; i < this.replaySteps; i++) {
+                const ri = Utils.randi(0, this.longTermMemory.length); // todo: priority sweeps?
+                const sarsa = this.longTermMemory[ri];
+                this.learnFromSarsaTuple(sarsa);
             }
         }
         
