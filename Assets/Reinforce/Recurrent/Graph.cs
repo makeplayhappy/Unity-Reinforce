@@ -60,7 +60,7 @@ namespace Recurrent{
 
     private void addRowPluckToBackpropagationStack(Mat m, int rowIndex, Mat matOut ) {
       if (this.needsBackpropagation) {
-        const backward = MatOps.getRowPluckBackprop(m, rowIndex, matOut);
+        Delegate backward = MatOps.getRowPluckBackprop(m, rowIndex, matOut);
         this.backpropagationStack.Add(backward);
       }
     }
@@ -70,24 +70,24 @@ namespace Recurrent{
     * @param m 
     * @param rowIndex 
     */
-    public gauss(m: Mat, std: Mat): Mat {
-      const out = MatOps.gauss(m, std);
-      return out;
+    public Mat gauss(Mat m, Mat std) {
+      Mat matOut = MatOps.gauss(m, std);
+      return matOut;
     }
 
     /**
     * Non-destructive elementwise tanh
     * @param m 
     */
-    public tanh(m: Mat): Mat {
-      const out = MatOps.tanh(m);
-      this.addTanhToBackpropagationStack(m, out);
-      return out;
+    public Mat tanh(Mat m) {
+      Mat matOut = MatOps.tanh(m);
+      this.addTanhToBackpropagationStack(m, matOut);
+      return matOut;
     }
 
-    private addTanhToBackpropagationStack(m: Mat, out: Mat) {
+    private void addTanhToBackpropagationStack(Mat m ,Mat matOut) {
       if (this.needsBackpropagation) {
-        const backward = MatOps.getTanhBackprop(m, out);
+        Delegate backward = MatOps.getTanhBackprop(m, matOut);
         this.backpropagationStack.push(backward);
       }
     }
@@ -96,15 +96,15 @@ namespace Recurrent{
     * Non-destructive elementwise sigmoid
     * @param m 
     */
-    public sig(m: Mat): Mat {
-      const out = MatOps.sig(m);
-      this.addSigmoidToBackpropagationStack(m, out);
-      return out;
+    public Matsig(Mat m) {
+      Mat matOut = MatOps.sig(m);
+      this.addSigmoidToBackpropagationStack(m, matOut);
+      return matOut;
     }
 
-    private addSigmoidToBackpropagationStack(m: Mat, out: Mat) {
+    private void addSigmoidToBackpropagationStack(Mat m, Mat matOut) {
       if (this.needsBackpropagation) {
-        const backward = MatOps.getSigmoidBackprop(m, out);
+        Delegate backward = MatOps.getSigmoidBackprop(m, matOut);
         this.backpropagationStack.push(backward);
       }
     }
@@ -113,15 +113,15 @@ namespace Recurrent{
     * Non-destructive elementwise ReLU (rectified linear unit)
     * @param m 
     */
-    public relu(m: Mat): Mat {
-      const out = MatOps.relu(m);
-      this.addReluToBackpropagationStack(m, out);
-      return out;
+    public Mat relu(Mat m) {
+      Mat matOut = MatOps.relu(m);
+      this.addReluToBackpropagationStack(m, matOut);
+      return matOut;
     }
 
-    private addReluToBackpropagationStack(m: Mat, out: Mat) {
+    private void addReluToBackpropagationStack(Mat m, Mat matOut) {
       if (this.needsBackpropagation) {
-        const backward = MatOps.getReluBackprop(m, out);
+        Delegate backward = MatOps.getReluBackprop(m, matOut);
         this.backpropagationStack.push(backward);
       }
     }
@@ -131,15 +131,15 @@ namespace Recurrent{
     * @param m1 
     * @param m2 
     */
-    public add(m1: Mat, m2: Mat): Mat {
-      const out = MatOps.add(m1, m2);
-      this.addAdditionToBackpropagationStack(m1, m2, out);
-      return out;
+    public Mat add(Mat m1, Mat m2) {
+      Mat matOut = MatOps.add(m1, m2);
+      this.addAdditionToBackpropagationStack(m1, m2, matOut);
+      return matOut;
     }
 
-    private addAdditionToBackpropagationStack(m1: Mat, m2: Mat, out: Mat) {
+    private void addAdditionToBackpropagationStack(Mat m1, Mat m2,Mat matOut) {
       if (this.needsBackpropagation) {
-        const backward = MatOps.getAddBackprop(m1, m2, out);
+        Delegate backward = MatOps.getAddBackprop(m1, m2, matOut);
         this.backpropagationStack.push(backward);
       }
     }
@@ -149,15 +149,15 @@ namespace Recurrent{
     * @param m1 
     * @param m2 
     */
-    public mul(m1: Mat, m2: Mat): Mat {
-      const out = MatOps.mul(m1, m2);
-      this.addMultiplyToBackpropagationStack(m1, m2, out);
-      return out;
+    public Mat mul(Mat m1, Mat m2) {
+      Mat matOut = MatOps.mul(m1, m2);
+      this.addMultiplyToBackpropagationStack(m1, m2, matOut);
+      return matOut;
     }
 
-    private addMultiplyToBackpropagationStack(m1: Mat, m2: Mat, out: Mat) {
+    private void addMultiplyToBackpropagationStack(Mat m1, Mat m2, Mat matOut) {
       if (this.needsBackpropagation) {
-        const backward = MatOps.getMulBackprop(m1, m2, out);
+        Delegate backward = MatOps.getMulBackprop(m1, m2, matOut);
         this.backpropagationStack.push(backward);
       }
     }
@@ -167,15 +167,15 @@ namespace Recurrent{
     * @param m1 
     * @param m2 
     */
-    public dot(m1: Mat, m2: Mat): Mat {
-      const out = MatOps.dot(m1, m2);
-      this.addDotToBackpropagationStack(m1, m2, out);
-      return out;
+    public Mat dot(Mat m1, Mat m2) {
+      Mat matOut = MatOps.dot(m1, m2);
+      this.addDotToBackpropagationStack(m1, m2, matOut);
+      return matOut;
     }
 
-    private addDotToBackpropagationStack(m1: Mat, m2: Mat, out: Mat) {
+    private void addDotToBackpropagationStack(Mat m1, Mat m2, Mat matOut) {
       if (this.needsBackpropagation) {
-        const backward = MatOps.getDotBackprop(m1, m2, out);
+        Delegate backward = MatOps.getDotBackprop(m1, m2, matOut);
         this.backpropagationStack.push(backward);
       }
     }
@@ -185,15 +185,15 @@ namespace Recurrent{
     * @param m1 
     * @param m2 
     */
-    public eltmul(m1: Mat, m2: Mat): Mat {
-      const out = MatOps.eltmul(m1, m2);
-      this.addEltmulToBackpropagationStack(m1, m2, out);
-      return out;
+    public Mat eltmul(Mat m1, Mat m2) {
+      Mat matOut = MatOps.eltmul(m1, m2);
+      this.addEltmulToBackpropagationStack(m1, m2, matOut);
+      return matOut;
     }
 
-    private addEltmulToBackpropagationStack(m1: Mat, m2: Mat, out: Mat) {
+    private void addEltmulToBackpropagationStack(Mat m1, Mat m2, Mat matOut) {
       if (this.needsBackpropagation) {
-        const backward = MatOps.getEltmulBackprop(m1, m2, out);
+        Delegate backward = MatOps.getEltmulBackprop(m1, m2, matOut);
         this.backpropagationStack.push(backward);
       }
     }
