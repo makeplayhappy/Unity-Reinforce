@@ -15,5 +15,19 @@ namespace Recurrent {
     public float otherMu { get; set; }
     public float otherStd { get; set; }
 
+
+      //constructors
+      public NetOpts(){
+
+      }
+
+      public NetOpts(int inputSize, int[] hiddenUnits, int outputSize ){
+        this.architectureInputSize = inputSize;
+        this.architectureHiddenUnits = hiddenUnits;
+        this.architectureOutputSize = outputSize;
+      }
+
   }
+
+
 }

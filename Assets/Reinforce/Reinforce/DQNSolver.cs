@@ -67,13 +67,8 @@ namespace Reinforce{
             this.numberOfStates = this.env.get('numberOfStates');
             this.numberOfActions = this.env.get('numberOfActions');
 
-            const netOpts: NetOpts = {
-                architecture: {
-                    inputSize: this.numberOfStates,
-                    hiddenUnits: this.numberOfHiddenUnits,
-                    outputSize: this.numberOfActions
-                }
-            };
+            NetOpts netOpts = new NetOpts(this.numberOfStates,this.numberOfHiddenUnits,this.numberOfActions);
+
             this.net = new Net(netOpts);
 
             this.learnTick = 0;
