@@ -63,7 +63,7 @@ namespace Reinforce{
             this.reset();
         }
 
-        public void reset() {
+        public override void reset() {
             this.numberOfHiddenUnits = this.opt.numberOfHiddenUnits;
             this.numberOfStates = this.env.numberOfStates;
             this.numberOfActions = this.env.numberOfActions;
@@ -106,7 +106,7 @@ namespace Reinforce{
         /**
         * Transforms Agent to (ready-to-stringify) JSON object
         */
-        public string toJSON(){
+        public override string toJSON(){
             /*
             const j = {
             ns: this.numberOfStates,
@@ -122,7 +122,7 @@ namespace Reinforce{
         * Loads an Agent from a (already parsed) JSON object
         * @param json with properties `nh`, `ns`, `na` and `net`
         */
-        public void fromJSON(string json) { //: { ns, nh, na, net }
+        public override void fromJSON(string json) { //: { ns, nh, na, net }
             /*
             this.numberOfStates = json.ns;
             this.numberOfHiddenUnits = json.nh;
@@ -136,7 +136,7 @@ namespace Reinforce{
         * @param state current state
         * @returns index of argmax action
         */
-        public int decide(float[] state) {
+        public override int decide(float[] state) {
             Mat stateVector = new Mat(this.numberOfStates, 1);
 
             stateVector.setFrom(state);
@@ -221,7 +221,7 @@ namespace Reinforce{
         * perform an update on Q function
         * @param r current reward passed to learn
         */
-        public void learn(float r) {
+        public override void learn(float r) {
             if (this.shortTermMemory.r0 && this.alpha > 0) {
                 this.learnFromSarsaTuple(this.shortTermMemory);
                 this.addToReplayMemory();

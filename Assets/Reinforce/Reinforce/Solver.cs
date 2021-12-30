@@ -25,8 +25,8 @@ namespace Reinforce{
         * @param state current state
         * @returns decided action
         */
-        public abstract int decide(int[] stateList);
-        public abstract void learn(int r1);
+        public abstract int decide(float[] stateList);
+        public abstract void learn(float r1);
         public abstract void reset();
         public abstract string toJSON();
         public abstract void fromJSON(string json);
