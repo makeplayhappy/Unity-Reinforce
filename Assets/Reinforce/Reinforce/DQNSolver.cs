@@ -34,38 +34,38 @@ namespace Reinforce{
         protected int memoryIndexTick;
 
 
-        public DQNSolver(Environment env, Options DQNOpt) : base( env, DQNOpt ) {
+        public DQNSolver(Environment env, DQNOpt opt) : base( env, opt ) {
 
             shortTermMemory = new SarsaExperience();
             //super(env, opt);
-            /*
-            this.numberOfHiddenUnits = opt.get('numberOfHiddenUnits');
             
-            this.epsilonMax = opt.get('epsilonMax');
-            this.epsilonMin = opt.get('epsilonMin');
-            this.epsilonDecayPeriod = opt.get('epsilonDecayPeriod');
-            this.epsilon = opt.get('epsilon');
+            this.numberOfHiddenUnits = opt.numberOfHiddenUnits;
             
-            this.experienceSize = opt.get('experienceSize');
-            this.gamma = opt.get('gamma');
-            this.alpha = opt.get('alpha');
-            this.doLossClipping = opt.get('doLossClipping');
-            this.lossClamp = opt.get('lossClamp');
-            this.doRewardClipping = opt.get('doRewardClipping');
-            this.rewardClamp = opt.get('rewardClamp');
+            this.epsilonMax = opt.epsilonMax;
+            this.epsilonMin = opt.epsilonMin;
+            this.epsilonDecayPeriod = opt.epsilonDecayPeriod;
+            this.epsilon = opt.epsilon;
             
-            this.keepExperienceInterval = opt.get('keepExperienceInterval');
-            this.replaySteps = opt.get('replaySteps');
+            this.experienceSize = opt.experienceSize;
+            this.gamma = opt.gamma;
+            this.alpha = opt.alpha;
+            this.doLossClipping = opt.doLossClipping;
+            this.lossClamp = opt.lossClamp;
+            this.doRewardClipping = opt.doRewardClipping;
+            this.rewardClamp = opt.rewardClamp;
             
-            this.isInTrainingMode = opt.get('trainingMode');
-            */
+            this.keepExperienceInterval = opt.keepExperienceInterval;
+            this.replaySteps = opt.replaySteps;
+            
+            this.isInTrainingMode = opt.trainingMode;
+            
             this.reset();
         }
 
         public void reset() {
-            this.numberOfHiddenUnits = this.opt.get('numberOfHiddenUnits');
-            this.numberOfStates = this.env.get('numberOfStates');
-            this.numberOfActions = this.env.get('numberOfActions');
+            this.numberOfHiddenUnits = this.opt.numberOfHiddenUnits;
+            this.numberOfStates = this.env.numberOfStates;
+            this.numberOfActions = this.env.numberOfActions;
 
             NetOpts netOpts = new NetOpts(this.numberOfStates,this.numberOfHiddenUnits,this.numberOfActions);
 
