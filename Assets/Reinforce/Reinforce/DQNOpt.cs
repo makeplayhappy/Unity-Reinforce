@@ -1,17 +1,17 @@
 //import { Opt } from './../.';
 
 namespace Reinforce{
-  class DQNOpt : Options {
-    protected boolean trainingMode = true;
+  public class DQNOpt : Options {
+    protected bool trainingMode = true;
     protected int[] numberOfHiddenUnits = new int[ 100 ]();
     protected float epsilonMax = 1.0f;
     protected float epsilonMin = 0.1f;
-    protected int epsilonDecayPeriod = 1e6;
+    protected int epsilonDecayPeriod = 1e6f;
     protected float epsilon = 0.05f;
     
     protected float gamma = 0.9f;
     protected float alpha = 0.01f;
-    protected int experienceSize = 1e6;
+    protected int experienceSize = 1e6f;
     protected bool doLossClipping = true;
     protected float lossClamp = 1.0f;
     protected bool doRewardClipping = true;
@@ -33,7 +33,7 @@ namespace Reinforce{
     * Defines a linear annealing of Epsilon for an Epsilon Greedy Policy during 'training' = true
     * @param epsilonMax upper bound of epsilon; defaults to 1.0
     * @param epsilonMin lower bound of epsilon; defaults to 0.1
-    * @param epsilonDecayPeriod number of timesteps; defaults to 1e6
+    * @param epsilonDecayPeriod number of timesteps; defaults to 1e6f
     */
     public void setEpsilonDecay(float epsilonMax, float epsilonMin, int epsilonDecayPeriod) {
       this.epsilonMax = epsilonMax;
@@ -107,7 +107,7 @@ namespace Reinforce{
 
     /**
     * Sets Replay Memory Size
-    * @param experienceSize defaults to 1e6
+    * @param experienceSize defaults to 1e6f
     */
     public void setExperienceSize(int experienceSize) {
       this.experienceSize = experienceSize;

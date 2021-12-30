@@ -1,4 +1,5 @@
 using UnityEngine;
+using Recurrent;
 
 namespace Reinforce{
     public class DQNSolver : Solver {

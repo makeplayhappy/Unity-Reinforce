@@ -1,7 +1,8 @@
 using UnityEngine;
 
 namespace Reinforce{
-    abstract class Solver {
+
+    public abstract class Solver {
 
         protected Environment env;
         protected Options opt;

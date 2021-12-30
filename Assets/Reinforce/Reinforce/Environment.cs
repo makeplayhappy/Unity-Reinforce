@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace Reinforce{
-    class Environment {
+    public class Environment {
         protected readonly int width;
         protected readonly int height;
         protected readonly int numberOfStates;

@@ -1,12 +1,14 @@
 //import { Mat } from '.';
 //import { MatOps } from './utils/mat-ops';
 using System;
+using System.Collections.Generic;
+
 namespace Recurrent{
-  class Graph {
+  public class Graph {
 
     private bool needsBackpropagation;
 
-    private readonly IList<Delegate> backpropagationStack ;
+    private readonly List<Delegate> backpropagationStack ;
 
     /**
     * Initializes a Graph to memorize Matrix Operation Sequences.
@@ -20,7 +22,7 @@ namespace Recurrent{
     * Switch whether to memorize the operation sequence for Backpropagation (true) or ignore it (false).
     * @param {boolean} isMemorizing true or false [defaults to false]
     */
-    public void memorizeOperationSequence(boolean isMemorizing = false) {
+    public void memorizeOperationSequence(bool isMemorizing = false) {
       this.needsBackpropagation = isMemorizing;
     }
 

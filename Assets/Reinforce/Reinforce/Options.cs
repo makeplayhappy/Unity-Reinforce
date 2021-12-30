@@ -14,7 +14,7 @@ using UnityEngine;
 ** * */
 
 namespace Reinforce{
-    class Options {
+    public class Options {
 
 
 

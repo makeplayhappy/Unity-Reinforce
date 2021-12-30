@@ -2,7 +2,7 @@
 
 
 namespace Recurrent{
-  class Net : NetOpts {
+  public class Net : NetOpts {
     public Mat W1;
     public Mat b1;
     public Mat W2t;

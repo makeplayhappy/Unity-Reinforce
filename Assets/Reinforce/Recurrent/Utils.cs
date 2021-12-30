@@ -126,14 +126,14 @@ namespace Recurrent{
         /**
         * Calculates the standard deviation of a given set
         * @param arr set of values
-        * @param precision the floating point precision for grouping results, e.g. 1e3 [defaults to 1e6]
+        * @param precision the floating point precision for grouping results, e.g. 1e3 [defaults to 1e6f]
         * mph - TODO: C# conversion - this could be better, needs some time spent to rework, doesn't appear to be used currently though !
         */
-        public static float[] mode(float[] arr, float precision = 1e6){
+        public static float[] mode(float[] arr, float precision = 1e6f){
             // as result can be bimodal or multimodal,
             // the returned result is provided as an array
             // mode of [3, 5, 4, 4, 1, 1, 2, 3] = [1, 3, 4]
-            //precision = precision ? precision : 1e6;
+            //precision = precision ? precision : 1e6f;
             List<float> modes = new List<float>();
             Dictionary<int,float> count = new Dictionary<int,float>();
             int num = 0;

@@ -22,7 +22,7 @@ namespace Recurrent{
     * Need to pass by reference into an Action ... C# doesnt really have a good solution - maybe delegates work
     * This may need complete re architecting
     */
-    delegate void refMatIntMat(ref Mat m, int rowIndex, Mat matOut);
+    public delegate void refMatIntMat(ref Mat m, int rowIndex, Mat matOut);
 
 
     public static refMatIntMat getRowPluckBackprop(ref Mat m, int rowIndex, Mat matOut ){
@@ -79,7 +79,7 @@ namespace Recurrent{
     }
 
 
-    delegate void refMatMat(ref Mat m, Mat matOut);
+    public delegate void refMatMat(ref Mat m, Mat matOut);
 
     public static refMatMat getTanhBackprop(ref Mat m, Mat matOut) {
       return () => {
@@ -154,7 +154,8 @@ namespace Recurrent{
       return matOut;
     }
 
-    delegate void refMatRefMatMat(ref Mat m1, ref Mat m2, Mat matOut);
+    public delegate void refMatRefMatMat(ref Mat m1, ref Mat m2, Mat matOut);
+
     public static refMatRefMatMat getAddBackprop(Mat m1, Mat m2, Mat matOut) {
       return () => {
         for (int i = 0; i < m1.w.length; i++) {
@@ -242,7 +243,8 @@ namespace Recurrent{
       }
       return matOut;
     }
-    delegate void refMatRefMatMat(ref Mat m1, ref Mat m2, Mat matOut);
+    //delegate void refMatRefMatMat(ref Mat m1, ref Mat m2, Mat matOut);
+
     public static refMatRefMatMat getEltmulBackprop(ref Mat m1, ref Mat m2, Mat matOut) {
       return () => {
         for (int i = 0; i < m1.w.length; i++) {
