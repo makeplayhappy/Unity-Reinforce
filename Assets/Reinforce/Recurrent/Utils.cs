@@ -24,8 +24,9 @@ namespace Recurrent{
         * @param {number} max upper bound
         * @returns {number} random integer value
         */
-        public static float randi(float min, float max) {
-            return MathF.Floor(Utils.randf(min, max));
+        public static int randi(int min, int max) {
+            return random.Next(min, max); // greater than or equal to minValue and less than maxValue; that is, the range of return values includes minValue but not maxValue
+            //return MathF.Floor(Utils.randf(min, max));
         }
 
         /**

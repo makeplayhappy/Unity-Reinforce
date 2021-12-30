@@ -35,7 +35,10 @@ namespace Reinforce{
 
 
         public DQNSolver(Environment env, Options DQNOpt) : base( env, DQNOpt ) {
+
+            shortTermMemory = new SarsaExperience();
             //super(env, opt);
+            /*
             this.numberOfHiddenUnits = opt.get('numberOfHiddenUnits');
             
             this.epsilonMax = opt.get('epsilonMax');
@@ -55,7 +58,7 @@ namespace Reinforce{
             this.replaySteps = opt.get('replaySteps');
             
             this.isInTrainingMode = opt.get('trainingMode');
-
+            */
             this.reset();
         }
 
@@ -65,11 +68,11 @@ namespace Reinforce{
             this.numberOfActions = this.env.get('numberOfActions');
 
             const netOpts: NetOpts = {
-            architecture: {
-                inputSize: this.numberOfStates,
-                hiddenUnits: this.numberOfHiddenUnits,
-                outputSize: this.numberOfActions
-            }
+                architecture: {
+                    inputSize: this.numberOfStates,
+                    hiddenUnits: this.numberOfHiddenUnits,
+                    outputSize: this.numberOfActions
+                }
             };
             this.net = new Net(netOpts);
 
@@ -82,7 +85,7 @@ namespace Reinforce{
             this.shortTermMemory.s1 = null;
             this.shortTermMemory.a1 = null;
 
-            this.longTermMemory = [];
+            this.longTermMemory = new SarsaExperience[]();
         }
 
         /**
@@ -224,9 +227,9 @@ namespace Reinforce{
         */
         public void learn(float r) {
             if (this.shortTermMemory.r0 && this.alpha > 0) {
-            this.learnFromSarsaTuple(this.shortTermMemory);
-            this.addToReplayMemory();
-            this.limitedSampledReplayLearning();
+                this.learnFromSarsaTuple(this.shortTermMemory);
+                this.addToReplayMemory();
+                this.limitedSampledReplayLearning();
             }
             this.shiftRewardIntoMemory(r);
         }
@@ -240,7 +243,7 @@ namespace Reinforce{
         * @param r current reward
         */
         protected float clipReward(float r) {
-            return this.doRewardClipping ? Math.sign(r) * Math.min(Math.abs(r), this.rewardClamp) : r;
+            return this.doRewardClipping ? MathF.Sign(r) * MathF.Min(MathF.Abs(r), this.rewardClamp) : r;
         }
 
         /**
@@ -248,12 +251,12 @@ namespace Reinforce{
         * @param {SarsaExperience} sarsa Object containing states, actions and reward of t & t-1
         */
         protected void learnFromSarsaTuple(SarsaExperience sarsa ) {
-            const q1Max = this.getTargetQ(sarsa.s1, sarsa.r0);
-            const q0ActionVector = this.backwardQ(sarsa.s0);
-            const q0Max = q0ActionVector.w[sarsa.a0];
+            float q1Max = this.getTargetQ(sarsa.s1, sarsa.r0);
+            Mat q0ActionVector = this.backwardQ(sarsa.s0);
+            float q0Max = q0ActionVector.w[sarsa.a0];
 
             // Loss_i(w_i) = [(r0 + gamma * Q'(s',a') - Q(s,a)) ^ 2]
-            let loss = q0Max - q1Max;
+            float loss = q0Max - q1Max;
             loss = this.clipLoss(loss);
 
             q0ActionVector.dw[sarsa.a0] = loss;
@@ -288,7 +291,7 @@ namespace Reinforce{
         }
 
         protected void addToReplayMemory() {
-            if (this.learnTick % this.keepExperienceInterval === 0) {
+            if (this.learnTick % this.keepExperienceInterval == 0) {
                 this.addShortTermToLongTermMemory();
             }
             this.learnTick++;
@@ -304,17 +307,19 @@ namespace Reinforce{
         }
 
         protected SarsaExperience extractSarsaExperience() {
+
             Mat s0 = new Mat(this.shortTermMemory.s0.rows, this.shortTermMemory.s0.cols);
             s0.setFrom(this.shortTermMemory.s0.w);
             Mat s1 = new Mat(this.shortTermMemory.s1.rows, this.shortTermMemory.s1.cols);
             s1.setFrom(this.shortTermMemory.s1.w);
-            SarsaExperience sarsa = {
+
+            SarsaExperience sarsa = new SarsaExperience(
                 s0,
-                a0: this.shortTermMemory.a0,
-                r0: this.shortTermMemory.r0,
+                this.shortTermMemory.a0,
+                this.shortTermMemory.r0,
                 s1,
-                a1: this.shortTermMemory.a1
-            };
+                this.shortTermMemory.a1);
+
             return sarsa;
         }
 
@@ -323,8 +328,8 @@ namespace Reinforce{
         */
         protected void limitedSampledReplayLearning() {
             for (int i = 0; i < this.replaySteps; i++) {
-                const ri = Utils.randi(0, this.longTermMemory.length); // todo: priority sweeps?
-                const sarsa = this.longTermMemory[ri];
+                int ri = Utils.randi(0, this.longTermMemory.length); // todo: priority sweeps?
+                SarsaExperience sarsa = this.longTermMemory[ri];
                 this.learnFromSarsaTuple(sarsa);
             }
         }
