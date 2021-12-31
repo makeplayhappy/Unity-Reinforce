@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
+using UnityEngine;
 
 
 namespace Recurrent{
 
     class Utils {
 
-        public static Random random = new Random();
+        public static System.Random random = new System.Random();
 
         /**
         * Returns a random floating point number of a uniform distribution between `min` and `max`
@@ -15,8 +16,12 @@ namespace Recurrent{
         * @returns {number} random float value
         */
         public static float randf(float min, float max) {
-            return random.NextSingle() * (max - min) + min;
+            return (float)random.NextDouble() * (max - min) + min;
         }
+        public static float rand() {
+            return (float)random.NextDouble();
+        }
+
 
         /**
         * Returns a random integer number of a uniform distribution between [`min`, `max`)
@@ -26,7 +31,7 @@ namespace Recurrent{
         */
         public static int randi(int min, int max) {
             return random.Next(min, max); // greater than or equal to minValue and less than maxValue; that is, the range of return values includes minValue but not maxValue
-            //return MathF.Floor(Utils.randf(min, max));
+            //return Mathf.Floor(Utils.randf(min, max));
         }
 
         /**
@@ -48,7 +53,7 @@ namespace Recurrent{
         */
         public static float skewedRandn(float mu, float std, float skew) {
             float sample = Utils.box_muller();
-            sample = MathF.Pow(sample, skew);
+            sample = Mathf.Pow(sample, skew);
             sample = (sample - 0.5f) * 10f;
             return mu + sample * std;
         }
@@ -73,9 +78,9 @@ namespace Recurrent{
             do {
                 u1 = u2 = 0f;
             // Convert interval from [0,1) to (0,1)
-                do { u1 = random.NextSingle(); } while (u1 == 0f);
-                do { u2 = random.NextSingle(); } while (u2 == 0f);
-                z0 = MathF.Sqrt(-2.0f * MathF.Log(u1)) * MathF.Cos(2.0f * MathF.PI * u2);
+                do { u1 = (float)random.NextDouble(); } while (u1 == 0f);
+                do { u2 = (float)random.NextDouble(); } while (u2 == 0f);
+                z0 = Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Cos(2.0f * Mathf.PI * u2);
                 z0 = (z0 * 0.1f) + 0.5f;
             } while (z0 > 1f || z0 < 0f); // resample c
             return z0;
@@ -140,7 +145,7 @@ namespace Recurrent{
             int maxCount = 0;
             // populate array with number counts
             for (int i = 0; i < arr.Length; i++) {
-                num = (int)MathF.Round(arr[i] * precision) / precision;
+                num = (int)Mathf.Round(arr[i] * precision) / precision;
                 count[num] = (count[num] || 0) + 1; // initialize or increment for number
                 if (count[num] > maxCount) {
                     maxCount = count[num]; // memorize count value of max index
@@ -200,7 +205,7 @@ namespace Recurrent{
         * @param normalization defaults to sample variance ('unbiased')
         */
         public static float std(float[] arr, string normalization = "unbiased") {
-            return MathF.Sqrt( Utils.var(arr, normalization));
+            return Mathf.Sqrt( Utils.var(arr, normalization));
         }
 
         /**
@@ -281,12 +286,12 @@ namespace Recurrent{
             float[] output = new float[]();
             float expSum = 0;
             for(int i = 0; i < arr.length; i++) {
-                expSum += MathF.Exp(arr[i]);
+                expSum += Mathf.Exp(arr[i]);
             }
             //adding small optimisation - multiply rather than divide in possible large iteration
             float expSumMultiplier = 1f / expSum;
             for(let i = 0; i < arr.length; i++) {
-                output[i] = MathF.Exp(arr[i]) * expSumMultiplier;
+                output[i] = Mathf.Exp(arr[i]) * expSumMultiplier;
             }
 
             return output;
@@ -316,7 +321,7 @@ namespace Recurrent{
         * @returns {number} 
         */
         public static int sampleWeighted(float[] arr) {
-            float r = random.NextSingle(); //in js this is between 0 - 1
+            float r = (float)random.NextDouble(); //in js this is between 0 - 1
             float c = 0f;
             for (int i = 0; i < arr.length; i++) {
                 c += arr[i];

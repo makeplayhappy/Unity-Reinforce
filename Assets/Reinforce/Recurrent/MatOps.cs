@@ -1,6 +1,7 @@
 using System.Diagnostics;
+using UnityEngine;
 namespace Recurrent{
-  class MatOps {
+  public class MatOps {
 
     /**
     * Non-destructively pluck a row of m with rowIndex
@@ -9,7 +10,7 @@ namespace Recurrent{
     * @returns a column Vector [cols, 1]
     */
     public static Mat rowPluck(Mat m , int rowIndex) {
-      Debug.Assert(rowIndex >= 0 && rowIndex < m.rows, "[class:MatOps] rowPluck: dimensions misaligned");
+      System.Diagnostics.Debug.Assert(rowIndex >= 0 && rowIndex < m.rows, "[class:MatOps] rowPluck: dimensions misaligned");
       Mat matOut = new Mat(m.cols, 1);
       for (int i = 0; i < m.cols; i++) {
         matOut.w[i] = m.w[m.cols * rowIndex + i];
@@ -57,7 +58,7 @@ namespace Recurrent{
     */
     public static Mat gauss(Mat m, Mat std) {
       //Mat.assert(m.w.length === std.w.length, '[class:MatOps] gauss: dimensions misaligned');
-      Debug.Assert(m.w.length == std.w.length, "[class:MatOps] gauss: dimensions misaligned");
+      System.Diagnostics.Debug.Assert(m.w.length == std.w.length, "[class:MatOps] gauss: dimensions misaligned");
       Mat matOut = new Mat(m.rows, m.cols);
       for (int i = 0; i < m.w.length; i++) {
         matOut.w[i] = Utils.randn(m.w[i], std.w[i]);
@@ -73,7 +74,7 @@ namespace Recurrent{
     public static Mat tanh(Mat m) {
       Mat matOut = new Mat(m.rows, m.cols);
       for (int i = 0; i < m.w.length; i++) {
-        matOut.w[i] = MathF.Tanh(m.w[i]);
+        matOut.w[i] = Mathf.Tanh(m.w[i]);
       }
       return matOut;
     }
@@ -106,7 +107,7 @@ namespace Recurrent{
     
     private static float sigmoid(float x) {
       // helper function for computing sigmoid
-      return 1.0f / (1f + MathF.Exp(-x));
+      return 1.0f / (1f + Mathf.Exp(-x));
     }
 
     public static refMatMat getSigmoidBackprop(ref Mat m, Mat matOut) {
@@ -126,7 +127,7 @@ namespace Recurrent{
     public static Mat relu(Mat m) {
       Mat matOut = new Mat(m.rows, m.cols);
       for (int i = 0; i < m.w.length; i++) {
-        matOut.w[i] = MathF.Max(0, m.w[i]); // relu
+        matOut.w[i] = Mathf.Max(0, m.w[i]); // relu
       }
       return matOut;
     }
@@ -146,7 +147,7 @@ namespace Recurrent{
     */
     public static Mat add(Mat m1, Mat m2) {
       //Mat.assert(m1.w.length === m2.w.length && m1.rows === m2.rows, '[class:MatOps] add: dimensions misaligned');
-      Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] add: dimensions misaligned");
+      System.Diagnostics.Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] add: dimensions misaligned");
       Mat matOut = new Mat(m1.rows, m1.cols);
       for (int i = 0; i < m1.w.length; i++) {
         matOut.w[i] = m1.w[i] + m2.w[i];
@@ -173,7 +174,7 @@ namespace Recurrent{
     */
     public static Mat mul(Mat m1, Mat m2) {
       //Mat.assert(m1.cols === m2.rows, '[class:MatOps] mul: dimensions misaligned');
-      Debug.Assert(m1.cols == m2.rows, "[class:MatOps] mul: dimensions misaligned");
+      System.Diagnostics.Debug.Assert(m1.cols == m2.rows, "[class:MatOps] mul: dimensions misaligned");
       Mat matOut = new Mat(m1.rows, m2.cols);
       for (int row = 0; row < m1.rows; row++) { // loop over rows of m1
         for (int col = 0; col < m2.cols; col++) { // loop over cols of m2
@@ -209,7 +210,7 @@ namespace Recurrent{
     */
     public static Mat dot(Mat m1 ,Mat m2)  {
       //Mat.assert(m1.w.length === m2.w.length && m1.rows === m2.rows, '[class:MatOps] dot: dimensions misaligned');
-      Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] dot: dimensions misaligned");
+      System.Diagnostics.Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] dot: dimensions misaligned");
       Mat matOut = new Mat(1, 1);
       float dot = 0.0f;
       for (int i = 0; i < m1.w.length; i++) {
@@ -236,7 +237,7 @@ namespace Recurrent{
     */
     public static Mat eltmul(Mat m1, Mat m2) {
       //Mat.assert(m1.w.length === m2.w.length && m1.rows === m2.rows, '[class:MatOps] eltmul: dimensions misaligned');
-      Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] eltmul: dimensions misaligned");
+      System.Diagnostics.Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] eltmul: dimensions misaligned");
       Mat matOut = new Mat(m1.rows, m1.cols);
       for (int i = 0; i < m1.w.length; i++) {
         matOut.w[i] = m1.w[i] * m2.w[i];

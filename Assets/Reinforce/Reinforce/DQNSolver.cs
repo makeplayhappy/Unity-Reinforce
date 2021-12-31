@@ -151,7 +151,7 @@ namespace Reinforce{
         protected int epsilonGreedyActionPolicy(Mat stateVector) {
             int actionIndex = 0;
 
-            if (Math.random() < this.currentEpsilon()) { // greedy Policy Filter
+            if (Utils.rand() < this.currentEpsilon()) { // greedy Policy Filter
                 actionIndex = Utils.randi(0, this.numberOfActions);
             } else {
             // Q function
@@ -239,7 +239,7 @@ namespace Reinforce{
         * @param r current reward
         */
         protected float clipReward(float r) {
-            return this.doRewardClipping ? MathF.Sign(r) * MathF.Min(MathF.Abs(r), this.rewardClamp) : r;
+            return this.doRewardClipping ? Mathf.Sign(r) * Mathf.Min(Mathf.Abs(r), this.rewardClamp) : r;
         }
 
         /**

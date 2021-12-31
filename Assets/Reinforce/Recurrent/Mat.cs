@@ -30,10 +30,10 @@ namespace Recurrent{
         * @param col
         * @returns the value of given row and column
         */
-        public int get(int row, int col) {
+        public float get(int row, int col) {
             int ix = this.getIndexBy(row, col);
             //Mat.assert(ix >= 0 && ix < this.w.Length, '[class:Mat] get: index out of bounds.');
-            Debug.Assert(ix >= 0 && ix < this.w.Length, "[class:Mat] get: index out of bounds.");
+            System.Diagnostics.Debug.Assert(ix >= 0 && ix < this.w.Length, "[class:Mat] get: index out of bounds.");
             return this.w[ix];
         }
 
@@ -46,7 +46,7 @@ namespace Recurrent{
         public void set(int row, int col, float v) {
             int ix = this.getIndexBy(row, col);
             //Mat.assert(ix >= 0 && ix < this.w.Length, '[class:Mat] set: index out of bounds.');
-            Debug.Assert(ix >= 0 && ix < this.w.Length, "[class:Mat] set: index out of bounds.");
+            System.Diagnostics.Debug.Assert(ix >= 0 && ix < this.w.Length, "[class:Mat] set: index out of bounds.");
             this.w[ix] = v;
         }
 
@@ -75,7 +75,7 @@ namespace Recurrent{
         * @param colIndex 
         */
         public void setColumn(Mat m, int colIndex) {
-            Debug.Assert(m.w.Length == this.rows, "[class:Mat] setColumn: dimensions misaligned.");
+            System.Diagnostics.Debug.Assert(m.w.Length == this.rows, "[class:Mat] setColumn: dimensions misaligned.");
             //Mat.assert(m.w.Length === this.rows, '[class:Mat] setColumn: dimensions misaligned.');
             for (int i = 0; i < m.w.Length; i++) {
                 this.w[(this.cols * i) + colIndex] = m.w[i];
@@ -113,7 +113,7 @@ namespace Recurrent{
         public static Mat fromJSON(string json) { // : {rows, n?, cols, d?, w}
             //const rows = json.rows || json.n;
             //const cols = json.cols || json.d;
-            int row,cols = 1;
+            int rows,cols = 1;
             Mat mat = new Mat(rows, cols);
             //for (let i = 0; i < mat._length; i++) {
             //    mat.w[i] = json.w[i];

@@ -3,15 +3,15 @@
 namespace Reinforce{
   public class DQNOpt : Options {
     protected bool trainingMode = true;
-    protected int[] numberOfHiddenUnits = new int[ 100 ]();
+    protected int[] numberOfHiddenUnits = new int[100];
     protected float epsilonMax = 1.0f;
     protected float epsilonMin = 0.1f;
-    protected int epsilonDecayPeriod = 1e6f;
+    protected int epsilonDecayPeriod = 1000000;// 1e6;
     protected float epsilon = 0.05f;
     
     protected float gamma = 0.9f;
     protected float alpha = 0.01f;
-    protected int experienceSize = 1e6f;
+    protected int experienceSize = 1000000;//1e6;
     protected bool doLossClipping = true;
     protected float lossClamp = 1.0f;
     protected bool doRewardClipping = true;

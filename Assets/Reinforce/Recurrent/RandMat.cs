@@ -7,8 +7,8 @@ namespace Recurrent{
     * @param mu Population mean for initialization
     * @param std Standard deviation for initialization
     */
-    RandMat(int rows, int cols, float mu, float std) {
-      base(rows, cols);
+    RandMat(int rows, int cols, float mu, float std) : base(rows, cols) {
+      
       Utils.fillRandn(this.w, mu, std);
     }
   }
