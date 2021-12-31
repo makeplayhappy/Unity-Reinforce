@@ -1,24 +1,24 @@
 //import { Opt } from './../.';
 
 namespace Reinforce{
-  public class DQNOpt : Options {
-    protected bool trainingMode = true;
-    protected int[] numberOfHiddenUnits = new int[100];
-    protected float epsilonMax = 1.0f;
-    protected float epsilonMin = 0.1f;
-    protected int epsilonDecayPeriod = 1000000;// 1e6;
-    protected float epsilon = 0.05f;
+  public class DQNOpt {
+    public bool trainingMode = true;
+    public int[] numberOfHiddenUnits = new int[100];
+    public float epsilonMax = 1.0f;
+    public float epsilonMin = 0.1f;
+    public int epsilonDecayPeriod = 1000000;// 1e6;
+    public float epsilon = 0.05f;
     
-    protected float gamma = 0.9f;
-    protected float alpha = 0.01f;
-    protected int experienceSize = 1000000;//1e6;
-    protected bool doLossClipping = true;
-    protected float lossClamp = 1.0f;
-    protected bool doRewardClipping = true;
-    protected float rewardClamp = 1.0f;
+    public float gamma = 0.9f;
+    public float alpha = 0.01f;
+    public int experienceSize = 1000000;//1e6;
+    public bool doLossClipping = true;
+    public float lossClamp = 1.0f;
+    public bool doRewardClipping = true;
+    public float rewardClamp = 1.0f;
     
-    protected int keepExperienceInterval = 25;
-    protected int replaySteps = 10;
+    public int keepExperienceInterval = 25;
+    public int replaySteps = 10;
 
     /**
     * Sets the number of neurons in hidden layer (currently only 1-d layer accepted)

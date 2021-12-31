@@ -5,14 +5,14 @@ namespace Recurrent{
   public class Net : NetOpts {
     public Mat W1;
     public Mat b1;
-    public Mat W2t;
+    public Mat W2;
     public Mat b2;
 
     /**
     * Generates a Neural Net instance from a pre-trained Neural Net JSON.
     * @param {{W1, b1, W2, b2}} opt Specs of the Neural Net.
     */
-    Net(Mat W1, Mat b1, Mat W2, Mat b2 ){
+    public Net(Mat W1, Mat b1, Mat W2, Mat b2 ){
       this.W1 = W1;
       this.b1 = b1;
       this.W2 = W2;
@@ -22,14 +22,14 @@ namespace Recurrent{
     * Generates a Neural Net with given specs.
     * @param {NetOpts} opt Specs of the Neural Net.
     */
-    Net( NetOpts opt){
+    public Net( NetOpts opt){
       this.initializeAsFreshInstance( opt );
     }
 
-    Net(){
+    public Net(){
       // { architecture: { inputSize: 1, hiddenUnits: [1], outputSize: 1 } }
       NetOpts opt = new NetOpts();
-      opt.architectureHiddenUnits = new int[1](1);
+      opt.architectureHiddenUnits = new int[] {1};
       opt.architectureInputSize = 1;
       opt.architectureOutputSize = 1;
       this.initializeAsFreshInstance( opt );

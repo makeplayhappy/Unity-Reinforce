@@ -9,7 +9,7 @@ namespace Recurrent{
     */
     RandMat(int rows, int cols, float mu, float std) : base(rows, cols) {
       
-      Utils.fillRandn(this.w, mu, std);
+      Utils.fillRandn(ref w, mu, std);
     }
   }
 }

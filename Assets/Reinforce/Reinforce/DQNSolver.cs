@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Recurrent;
 
@@ -26,39 +27,39 @@ namespace Reinforce{
         public readonly int replaySteps;
         
         // Local
-        protected Net net;
-        protected Graph previousGraph;
-        protected SarsaExperience shortTermMemory;// = new SarsaExperience(){ s0: null, a0: null, r0: null, s1: null, a1: null };
-        protected SarsaExperience[] longTermMemory;
-        protected bool isInTrainingMode;
-        protected int learnTick;
-        protected int memoryIndexTick;
+        private Net net;
+        private Graph previousGraph;
+        private SarsaExperience shortTermMemory;// = new SarsaExperience(){ s0: null, a0: null, r0: null, s1: null, a1: null };
+        private List<SarsaExperience> longTermMemory;
+        private bool isInTrainingMode;
+        private int learnTick;
+        private int memoryIndexTick;
 
 
-        public DQNSolver(Environment env, DQNOpt opt) : base( env, opt ) {
+        DQNSolver(Environment environ, DQNOpt option) : base( environ, option ) {
 
             shortTermMemory = new SarsaExperience();
             //super(env, opt);
             
-            this.numberOfHiddenUnits = opt.numberOfHiddenUnits;
+            this.numberOfHiddenUnits = option.numberOfHiddenUnits;
             
-            this.epsilonMax = opt.epsilonMax;
-            this.epsilonMin = opt.epsilonMin;
-            this.epsilonDecayPeriod = opt.epsilonDecayPeriod;
-            this.epsilon = opt.epsilon;
+            this.epsilonMax = option.epsilonMax;
+            this.epsilonMin = option.epsilonMin;
+            this.epsilonDecayPeriod = option.epsilonDecayPeriod;
+            this.epsilon = option.epsilon;
             
-            this.experienceSize = opt.experienceSize;
-            this.gamma = opt.gamma;
-            this.alpha = opt.alpha;
-            this.doLossClipping = opt.doLossClipping;
-            this.lossClamp = opt.lossClamp;
-            this.doRewardClipping = opt.doRewardClipping;
-            this.rewardClamp = opt.rewardClamp;
+            this.experienceSize = option.experienceSize;
+            this.gamma = option.gamma;
+            this.alpha = option.alpha;
+            this.doLossClipping = option.doLossClipping;
+            this.lossClamp = option.lossClamp;
+            this.doRewardClipping = option.doRewardClipping;
+            this.rewardClamp = option.rewardClamp;
             
-            this.keepExperienceInterval = opt.keepExperienceInterval;
-            this.replaySteps = opt.replaySteps;
+            this.keepExperienceInterval = option.keepExperienceInterval;
+            this.replaySteps = option.replaySteps;
             
-            this.isInTrainingMode = opt.trainingMode;
+            this.isInTrainingMode = option.trainingMode;
             
             this.reset();
         }
@@ -81,7 +82,7 @@ namespace Reinforce{
             this.shortTermMemory.s1 = null;
             this.shortTermMemory.a1 = null;
 
-            this.longTermMemory = new SarsaExperience[]();
+            this.longTermMemory = new List<SarsaExperience>(); // could be new SarsaExperience[experienceSize]()
         }
 
         /**
@@ -206,6 +207,7 @@ namespace Reinforce{
             return a2mat;
         }
 
+        // - TODO - this shouldn't pass by reference.... check this
         protected void backupGraph(Graph graph) {
             this.previousGraph = graph;
         }
@@ -222,7 +224,7 @@ namespace Reinforce{
         * @param r current reward passed to learn
         */
         public override void learn(float r) {
-            if (this.shortTermMemory.r0 && this.alpha > 0) {
+            if (this.shortTermMemory.r0 != null && this.alpha > 0) {
                 this.learnFromSarsaTuple(this.shortTermMemory);
                 this.addToReplayMemory();
                 this.limitedSampledReplayLearning();
@@ -324,7 +326,7 @@ namespace Reinforce{
         */
         protected void limitedSampledReplayLearning() {
             for (int i = 0; i < this.replaySteps; i++) {
-                int ri = Utils.randi(0, this.longTermMemory.length); // todo: priority sweeps?
+                int ri = Utils.randi(0, this.longTermMemory.Count); // todo: priority sweeps?
                 SarsaExperience sarsa = this.longTermMemory[ri];
                 this.learnFromSarsaTuple(sarsa);
             }

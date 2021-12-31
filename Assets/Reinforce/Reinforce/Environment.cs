@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace Reinforce{
     public class Environment {
-        protected readonly int width;
-        protected readonly int height;
-        protected readonly int numberOfStates;
-        protected readonly int numberOfActions;
+        public readonly int width;
+        public readonly int height;
+        public readonly int numberOfStates;
+        public readonly int numberOfActions;
 
     }
 }

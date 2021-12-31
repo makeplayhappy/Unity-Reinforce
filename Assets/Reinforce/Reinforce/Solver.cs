@@ -4,15 +4,15 @@ namespace Reinforce{
 
     public abstract class Solver {
 
-        protected Environment env;
-        protected Options opt;
+        public Environment env;
+        public DQNOpt opt;
 
-        Solver(Environment env, Options opt) {
-            this.env = env;
-            this.opt = opt;
+        public Solver(Environment environment, DQNOpt options) {
+            env = environment;
+            opt = options;
         }
 
-        public Options getOpt(){
+        public DQNOpt getOpt(){
             return opt;
         }
 

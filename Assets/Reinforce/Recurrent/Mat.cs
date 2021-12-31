@@ -7,18 +7,18 @@ namespace Recurrent{
         public readonly int cols;
         private readonly int _length;  // length of 1d-representation of Mat
 
-        public readonly float[] w;
-        public readonly float[] dw;
+        public float[] w;
+        public float[] dw;
 
         /**
         * 
         * @param rows rows of Matrix
         * @param cols columns of Matrix
         */
-        Mat(int rows, int cols) {
+        public Mat(int rowsIn, int colsIn) {
             //super();
-            this.rows = rows;
-            this.cols = cols;
+            rows = rowsIn;
+            cols = colsIn;
             this._length = rows * cols;
             this.w = Utils.zeros(this._length);
             this.dw = Utils.zeros(this._length);
@@ -113,8 +113,9 @@ namespace Recurrent{
         public static Mat fromJSON(string json) { // : {rows, n?, cols, d?, w}
             //const rows = json.rows || json.n;
             //const cols = json.cols || json.d;
-            int rows,cols = 1;
-            Mat mat = new Mat(rows, cols);
+            int rowsInit = 1;
+            int colsInit = 1;
+            Mat mat = new Mat(rowsInit, colsInit);
             //for (let i = 0; i < mat._length; i++) {
             //    mat.w[i] = json.w[i];
             //}

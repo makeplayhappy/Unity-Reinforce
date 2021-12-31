@@ -13,7 +13,7 @@ namespace Recurrent{
     /**
     * Initializes a Graph to memorize Matrix Operation Sequences.
     */
-    Graph() {
+    public Graph() {
       this.needsBackpropagation = false;
       this.backpropagationStack = new List<GraphStack>();
     }

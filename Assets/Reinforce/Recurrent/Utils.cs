@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -92,7 +93,7 @@ namespace Recurrent{
         */
         public static float sum(float[] arr) {
             float sum = 0;
-            for (int i = 0; i < arr.length; i++) {
+            for (int i = 0; i < arr.Length; i++) {
                 sum += arr[i];
             }
             return sum;
