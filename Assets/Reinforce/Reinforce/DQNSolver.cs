@@ -251,24 +251,32 @@ namespace Reinforce{
         protected void learnFromSarsaTuple(SarsaExperience sarsa ) {
             float q1Max = this.getTargetQ(sarsa.s1, sarsa.r0);
             Mat q0ActionVector = this.backwardQ(sarsa.s0);
-            float q0Max = q0ActionVector.w[sarsa.a0];
+            //float q0Max = 0f;
+            //if( sarsa.a0 != null){
+                float q0Max = q0ActionVector.w[(int)sarsa.a0];
+            //}
 
             // Loss_i(w_i) = [(r0 + gamma * Q'(s',a') - Q(s,a)) ^ 2]
             float loss = q0Max - q1Max;
             loss = this.clipLoss(loss);
 
-            q0ActionVector.dw[sarsa.a0] = loss;
+            //if( sarsa.a0 != null){
+                q0ActionVector.dw[(int)sarsa.a0] = loss;
+            //}
             this.previousGraph.backward();
 
             // discount all weights of net depending on their gradients
             this.net.update(this.alpha);
         }
 
-        protected float getTargetQ(Mat s1 , float r0) {
+        protected float getTargetQ(Mat s1 , float? r0) {
+            //if(r0 == null){
+            //    r0 = 0f;
+            //}
             // want: Q(s,a) = r + gamma * max_a' Q(s',a')
             Mat targetActionVector = this.forwardQ(s1);
             int targetActionIndex = Utils.argmax(targetActionVector.w);
-            float qMax = r0 + this.gamma * targetActionVector.w[targetActionIndex];
+            float qMax = (float)r0 + this.gamma * targetActionVector.w[targetActionIndex];
             return qMax;
         }
 

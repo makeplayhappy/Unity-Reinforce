@@ -18,12 +18,12 @@ namespace Reinforce{
             this.a1 = null;
         }
 
-        public SarsaExperience(Mat s0, int a0, float r0, Mat s1, int a1){
+        public SarsaExperience(Mat s0, int? a0, float? r0, Mat s1, int? a1){
             this.s0 = s0;
-            this.a0 = a0;
-            this.r0 = r0;
+            this.a0 = (int)a0;
+            this.r0 = (float)r0;
             this.s1 = s1;
-            this.a1 = a1;
+            this.a1 = (int)a1;
 
 
         }

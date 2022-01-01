@@ -143,25 +143,27 @@ namespace Recurrent{
             List<float> modes = new List<float>();
             Dictionary<int,float> count = new Dictionary<int,float>();
             int num = 0;
-            int maxCount = 0;
+            float maxCount = 0;
             // populate array with number counts
             for (int i = 0; i < arr.Length; i++) {
-                num = (int)Mathf.Round(arr[i] * precision) / precision;
-                count[num] = (count[num] || 0) + 1; // initialize or increment for number
+                num = (int)(Mathf.Round(arr[i] * precision) / precision);
+                count[num] = (count[num] == null ) ? 1f : count[num] + 1f; // initialize or increment for number
                 if (count[num] > maxCount) {
                     maxCount = count[num]; // memorize count value of max index
                 }
             }
             // memorize numbers equal with maxCount
             //for (int i in count) {
-            foreach (var (key, value) in count) {
+            //foreach (var (key, value) in count) {
+            foreach(KeyValuePair<int, float> entry in count){
                // if (count.hasOwnProperty(i)) {
                     //if (count[i] === maxCount) {
-                    if (value == maxCount) {    
-                        modes.Add( (float)key );
+                    if (entry.Value == maxCount) {    
+                        modes.Add( (float)entry.Key );
                     }
                 //}
             }
+
             return modes.ToArray();
         }
 
@@ -196,7 +198,7 @@ namespace Recurrent{
                     return (float)((count == 1) ? 0 : sum / (count - 1));
                 break;
                 default:
-                    return ;
+                    return 0f ;
                 }
         }
 
@@ -217,7 +219,7 @@ namespace Recurrent{
         * @returns {void} void
         */
         public static void fillRandn(ref float[] arr, float mu, float std) {
-            for (int i = 0; i < arr.length; i++) { 
+            for (int i = 0; i < arr.Length; i++) { 
                 arr[i] = Utils.randn(mu, std); 
             }
         }
@@ -230,7 +232,7 @@ namespace Recurrent{
         * @returns {void} void
         */
         public static void fillRand(ref float[] arr, float min, float max){
-            for (int i = 0; i < arr.length; i++) { 
+            for (int i = 0; i < arr.Length; i++) { 
                 arr[i] = Utils.randf(min, max); 
             }
         }
@@ -242,7 +244,7 @@ namespace Recurrent{
         * @returns {void} void
         */
         public static void fillConst(ref float[] arr, float c) {
-            for (int i = 0; i < arr.length; i++) { 
+            for (int i = 0; i < arr.Length; i++) { 
                 arr[i] = c; 
             }
         }
@@ -268,11 +270,11 @@ namespace Recurrent{
         private static float[] fillArray(int n, float val) {
 
             if ( n == null || Single.NaN == n ) { 
-                return new float[]; 
+                return new float[1]{ val }; 
             }
 
-            float[] arr = new float[n]();
-            for ( int i = 0; i < arr.Length;i++ ) {
+            float[] arr = new float[n];
+            for ( int i = 0; i < n;i++ ) {
                 arr[i] = val;
             }
             return arr;
@@ -284,14 +286,15 @@ namespace Recurrent{
         * @param {Array<number> | Float64Array} arr set of values
         */
         public static float[] softmax(float[] arr) {
-            float[] output = new float[]();
+            
             float expSum = 0;
-            for(int i = 0; i < arr.length; i++) {
+            for(int i = 0; i < arr.Length; i++) {
                 expSum += Mathf.Exp(arr[i]);
             }
             //adding small optimisation - multiply rather than divide in possible large iteration
             float expSumMultiplier = 1f / expSum;
-            for(let i = 0; i < arr.length; i++) {
+            float[] output = new float[ arr.Length ];
+            for(int i = 0; i < arr.Length; i++) {
                 output[i] = Mathf.Exp(arr[i]) * expSumMultiplier;
             }
 
@@ -306,7 +309,7 @@ namespace Recurrent{
         public static int argmax(float[] arr) {
             float maxValue = arr[0];
             int maxIndex = 0;
-            for (int i = 1; i < arr.length; i++) {
+            for (int i = 1; i < arr.Length; i++) {
                 //const v = arr[i];
                 if (arr[i] > maxValue) {
                     maxIndex = i;
@@ -324,7 +327,7 @@ namespace Recurrent{
         public static int sampleWeighted(float[] arr) {
             float r = (float)random.NextDouble(); //in js this is between 0 - 1
             float c = 0f;
-            for (int i = 0; i < arr.length; i++) {
+            for (int i = 0; i < arr.Length; i++) {
                 c += arr[i];
                 if (c >= r) { 
                     return i; 
@@ -332,6 +335,12 @@ namespace Recurrent{
             }
 
             return 0;
+        }
+
+
+        
+        public static float Tanh(float f){
+            return (float)System.Math.Tanh((double)f);
         }
 
     }

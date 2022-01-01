@@ -57,10 +57,10 @@ namespace Recurrent{
     * @returns {Mat} Matrix with results
     */
     public static Mat gauss(Mat m, Mat std) {
-      //Mat.assert(m.w.length === std.w.length, '[class:MatOps] gauss: dimensions misaligned');
-      System.Diagnostics.Debug.Assert(m.w.length == std.w.length, "[class:MatOps] gauss: dimensions misaligned");
+      //Mat.assert(m.w.Length === std.w.Length, '[class:MatOps] gauss: dimensions misaligned');
+      System.Diagnostics.Debug.Assert(m.w.Length == std.w.Length, "[class:MatOps] gauss: dimensions misaligned");
       Mat matOut = new Mat(m.rows, m.cols);
-      for (int i = 0; i < m.w.length; i++) {
+      for (int i = 0; i < m.w.Length; i++) {
         matOut.w[i] = Utils.randn(m.w[i], std.w[i]);
       }
       return matOut;
@@ -73,7 +73,7 @@ namespace Recurrent{
     */
     public static Mat tanh(Mat m) {
       Mat matOut = new Mat(m.rows, m.cols);
-      for (int i = 0; i < m.w.length; i++) {
+      for (int i = 0; i < m.w.Length; i++) {
         matOut.w[i] = Mathf.Tanh(m.w[i]);
       }
       return matOut;
@@ -84,7 +84,7 @@ namespace Recurrent{
 
     public static refMatMat getTanhBackprop(ref Mat m, Mat matOut) {
       return () => {
-        for (int i = 0; i < m.w.length; i++) {
+        for (int i = 0; i < m.w.Length; i++) {
           // grad for z = tanh(x) is (1 - z^2)
           float mwi = matOut.w[i];
           m.dw[i] += (1.0f - mwi * mwi) * matOut.dw[i];
@@ -99,7 +99,7 @@ namespace Recurrent{
     */
     public static Mat sig(Mat m) {
       Mat matOut = new Mat(m.rows, m.cols);
-      for (int i = 0; i < m.w.length; i++) {
+      for (int i = 0; i < m.w.Length; i++) {
         matOut.w[i] = MatOps.sigmoid(m.w[i]);
       }
       return matOut;
@@ -112,7 +112,7 @@ namespace Recurrent{
 
     public static refMatMat getSigmoidBackprop(ref Mat m, Mat matOut) {
       return () => {
-        for (int i = 0; i < m.w.length; i++) {
+        for (int i = 0; i < m.w.Length; i++) {
           // grad for z = tanh(x) is (1 - z^2)
           float mwi = matOut.w[i];
           m.dw[i] += mwi * (1.0f - mwi) * matOut.dw[i];
@@ -126,7 +126,7 @@ namespace Recurrent{
     */
     public static Mat relu(Mat m) {
       Mat matOut = new Mat(m.rows, m.cols);
-      for (int i = 0; i < m.w.length; i++) {
+      for (int i = 0; i < m.w.Length; i++) {
         matOut.w[i] = Mathf.Max(0, m.w[i]); // relu
       }
       return matOut;
@@ -134,7 +134,7 @@ namespace Recurrent{
 
     public static refMatMat getReluBackprop(ref Mat m, Mat matOut) {
       return () => {
-        for (int i = 0; i < m.w.length; i++) {
+        for (int i = 0; i < m.w.Length; i++) {
           m.dw[i] += m.w[i] > 0 ? matOut.dw[i] : 0.0;
         }
       };
@@ -146,10 +146,10 @@ namespace Recurrent{
     * @param {Mat} m2 
     */
     public static Mat add(Mat m1, Mat m2) {
-      //Mat.assert(m1.w.length === m2.w.length && m1.rows === m2.rows, '[class:MatOps] add: dimensions misaligned');
-      System.Diagnostics.Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] add: dimensions misaligned");
+      //Mat.assert(m1.w.Length === m2.w.Length && m1.rows === m2.rows, '[class:MatOps] add: dimensions misaligned');
+      System.Diagnostics.Debug.Assert(m1.w.Length == m2.w.Length && m1.rows == m2.rows, "[class:MatOps] add: dimensions misaligned");
       Mat matOut = new Mat(m1.rows, m1.cols);
-      for (int i = 0; i < m1.w.length; i++) {
+      for (int i = 0; i < m1.w.Length; i++) {
         matOut.w[i] = m1.w[i] + m2.w[i];
       }
       return matOut;
@@ -159,7 +159,7 @@ namespace Recurrent{
 
     public static refMatRefMatMat getAddBackprop(Mat m1, Mat m2, Mat matOut) {
       return () => {
-        for (int i = 0; i < m1.w.length; i++) {
+        for (int i = 0; i < m1.w.Length; i++) {
           m1.dw[i] += matOut.dw[i];
           m2.dw[i] += matOut.dw[i];
         }
@@ -209,11 +209,11 @@ namespace Recurrent{
     * @return {Mat} Matrix of dimension 1x1
     */
     public static Mat dot(Mat m1 ,Mat m2)  {
-      //Mat.assert(m1.w.length === m2.w.length && m1.rows === m2.rows, '[class:MatOps] dot: dimensions misaligned');
-      System.Diagnostics.Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] dot: dimensions misaligned");
+      //Mat.assert(m1.w.Length === m2.w.Length && m1.rows === m2.rows, '[class:MatOps] dot: dimensions misaligned');
+      System.Diagnostics.Debug.Assert(m1.w.Length == m2.w.Length && m1.rows == m2.rows, "[class:MatOps] dot: dimensions misaligned");
       Mat matOut = new Mat(1, 1);
       float dot = 0.0f;
-      for (int i = 0; i < m1.w.length; i++) {
+      for (int i = 0; i < m1.w.Length; i++) {
         dot += m1.w[i] * m2.w[i];
       }
       matOut.w[0] = dot;
@@ -222,7 +222,7 @@ namespace Recurrent{
 
     public static refMatRefMatMat getDotBackprop(ref Mat m1 ,ref Mat m2, Mat matOut) {
       return () => {
-        for (int i = 0; i < m1.w.length; i++) {
+        for (int i = 0; i < m1.w.Length; i++) {
           m1.dw[i] += m2.w[i] * matOut.dw[0];
           m2.dw[i] += m1.w[i] * matOut.dw[0];
         }
@@ -236,10 +236,10 @@ namespace Recurrent{
     * @return {Mat} Matrix with results
     */
     public static Mat eltmul(Mat m1, Mat m2) {
-      //Mat.assert(m1.w.length === m2.w.length && m1.rows === m2.rows, '[class:MatOps] eltmul: dimensions misaligned');
-      System.Diagnostics.Debug.Assert(m1.w.length == m2.w.length && m1.rows == m2.rows, "[class:MatOps] eltmul: dimensions misaligned");
+      //Mat.assert(m1.w.Length === m2.w.Length && m1.rows === m2.rows, '[class:MatOps] eltmul: dimensions misaligned');
+      System.Diagnostics.Debug.Assert(m1.w.Length == m2.w.Length && m1.rows == m2.rows, "[class:MatOps] eltmul: dimensions misaligned");
       Mat matOut = new Mat(m1.rows, m1.cols);
-      for (int i = 0; i < m1.w.length; i++) {
+      for (int i = 0; i < m1.w.Length; i++) {
         matOut.w[i] = m1.w[i] * m2.w[i];
       }
       return matOut;
@@ -248,7 +248,7 @@ namespace Recurrent{
 
     public static refMatRefMatMat getEltmulBackprop(ref Mat m1, ref Mat m2, Mat matOut) {
       return () => {
-        for (int i = 0; i < m1.w.length; i++) {
+        for (int i = 0; i < m1.w.Length; i++) {
           m1.dw[i] += m2.w[i] * matOut.dw[i];
           m2.dw[i] += m1.w[i] * matOut.dw[i];
         }

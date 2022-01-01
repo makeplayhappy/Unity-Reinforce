@@ -65,11 +65,11 @@ namespace Recurrent{
       float std = 0.01f;
 
       //if(Net.has(opt, ['other'])) {
-        mu = opt.otherMu ? opt.otherMu : mu;
-        std = opt.otherStd ? opt.otherStd : std;
+        mu = opt.otherMu != null ? opt.otherMu : mu;
+        std = opt.otherStd != null ? opt.otherStd : std;
       //}
       int firstLayer = 0; // only consider the first layer => shallowness
-      this.W1 = new RandMat(opt.ArchitectureHiddenUnits[firstLayer], opt.architectureInputSize, mu, std);
+      this.W1 = new RandMat(opt.architectureHiddenUnits[firstLayer], opt.architectureInputSize, mu, std);
       this.b1 = new Mat(opt.architectureHiddenUnits[firstLayer], 1);
       this.W2 = new RandMat(opt.architectureOutputSize, opt.architectureHiddenUnits[firstLayer], mu, std);
       this.b2 = new Mat(opt.architectureOutputSize, 1);
