@@ -29,6 +29,11 @@ namespace Reinforce{
       this.numberOfHiddenUnits = numberOfHiddenUnits;
     }
 
+    public void setNumberOfHiddenUnits(int numberOfHiddenUnits) {
+      // TODO: Add DNN support
+      this.numberOfHiddenUnits = new int[numberOfHiddenUnits];
+    }
+
     /**
     * Defines a linear annealing of Epsilon for an Epsilon Greedy Policy during 'training' = true
     * @param epsilonMax upper bound of epsilon; defaults to 1.0

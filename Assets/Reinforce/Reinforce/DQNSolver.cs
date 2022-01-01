@@ -36,7 +36,7 @@ namespace Reinforce{
         private int memoryIndexTick;
 
 
-        DQNSolver(Environment environ, DQNOpt option) : base( environ, option ) {
+        public DQNSolver(Environment environ, DQNOpt option) : base( environ, option ) {
 
             shortTermMemory = new SarsaExperience();
             //super(env, opt);
