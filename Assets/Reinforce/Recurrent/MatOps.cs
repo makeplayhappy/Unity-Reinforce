@@ -26,7 +26,7 @@ namespace Recurrent{
     //public delegate void refMatIntMat(ref Mat m, int rowIndex, Mat matOut);
 
 
-    public static void getRowPluckBackprop(ref Mat m, int rowIndex, Mat matOut ){
+    public static void getRowPluckBackprop(ref Mat m, int rowIndex, ref Mat matOut ){
 
         for (int i = 0; i < m.cols; i++) {
           m.dw[m.cols * rowIndex + i] += matOut.dw[i];
