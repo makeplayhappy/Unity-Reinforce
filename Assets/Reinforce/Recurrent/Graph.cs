@@ -50,6 +50,9 @@ namespace Recurrent{
       }
     }
 
+
+    // Note: maybe a better architecture to move the MatOps into the GraphStack class, encapsulate all the properties and methods and then call a processing method to run through them
+    // doing it like below is a bit too much pass the parcel...
     private void procesBackpropagationStack(GraphStack entry){
       switch(entry.operation){
 
@@ -61,24 +64,38 @@ namespace Recurrent{
       
         case GraphOperations.Tanh:
 
+          MatOps.getTanhBackprop(ref entry.m1, ref entry.matOut);
+
         break;
         case GraphOperations.Sigmoid:
+
+          MatOps.getSigmoidBackprop(ref entry.m1, ref entry.matOut);
 
         break;
         case GraphOperations.Relu:
 
+          MatOps.getReluBackprop(ref entry.m1, ref entry.matOut);
+
         break;
         case GraphOperations.Addition:
+
+          MatOps.getAddBackprop(ref entry.m1, ref entry.m2, ref entry.matOut);
 
         break;
         case GraphOperations.Multiply:
 
+          MatOps.getMulBackprop(ref entry.m1, ref entry.m2, ref entry.matOut);
+
         break;
         case GraphOperations.Dot:
+
+          MatOps.getDotBackprop(ref entry.m1, ref entry.m2, ref entry.matOut);
 
         break;
         case GraphOperations.ElementMultiply:
 
+          MatOps.getEltmulBackprop(ref entry.m1, ref entry.m2, ref entry.matOut);
+          
         break;
       }
 
@@ -128,7 +145,7 @@ namespace Recurrent{
     private void addTanhToBackpropagationStack(Mat m ,Mat matOut) {
       if (this.needsBackpropagation) {
         //Delegate backward = MatOps.getTanhBackprop(m, matOut);
-        GraphStack entry = new GraphStack(GraphOperations.Tanh, m, matOut );
+        GraphStack entry = new GraphStack(GraphOperations.Tanh, ref m, ref matOut );
         this.backpropagationStack.Add( entry );
       }
     }
@@ -146,7 +163,7 @@ namespace Recurrent{
     private void addSigmoidToBackpropagationStack(Mat m, Mat matOut) {
       if (this.needsBackpropagation) {
         //Delegate backward = MatOps.getSigmoidBackprop(m, matOut);
-        GraphStack entry = new GraphStack(GraphOperations.Sigmoid, m, matOut );
+        GraphStack entry = new GraphStack(GraphOperations.Sigmoid, ref m, ref matOut );
         this.backpropagationStack.Add( entry );
       }
     }
@@ -164,7 +181,7 @@ namespace Recurrent{
     private void addReluToBackpropagationStack(Mat m, Mat matOut) {
       if (this.needsBackpropagation) {
         //Delegate backward = MatOps.getReluBackprop(m, matOut);
-        GraphStack entry = new GraphStack(GraphOperations.Relu, m, matOut );
+        GraphStack entry = new GraphStack(GraphOperations.Relu, ref m, ref matOut );
         this.backpropagationStack.Add( entry );
       }
     }
@@ -183,7 +200,7 @@ namespace Recurrent{
     private void addAdditionToBackpropagationStack(Mat m1, Mat m2, Mat matOut) {
       if (this.needsBackpropagation) {
         //Delegate backward = MatOps.getAddBackprop(m1, m2, matOut);
-        GraphStack entry = new GraphStack(GraphOperations.Addition, m1, m2, matOut );
+        GraphStack entry = new GraphStack(GraphOperations.Addition, ref m1, ref m2, ref matOut );
         this.backpropagationStack.Add( entry );
       }
     }
@@ -202,7 +219,7 @@ namespace Recurrent{
     private void addMultiplyToBackpropagationStack(Mat m1, Mat m2, Mat matOut) {
       if (this.needsBackpropagation) {
         //Delegate backward = MatOps.getMulBackprop(m1, m2, matOut);
-        GraphStack entry = new GraphStack(GraphOperations.Multiply, m1, m2, matOut );
+        GraphStack entry = new GraphStack(GraphOperations.Multiply, ref m1, ref m2, ref matOut );
         this.backpropagationStack.Add( entry );
       }
     }
@@ -221,7 +238,7 @@ namespace Recurrent{
     private void addDotToBackpropagationStack(Mat m1, Mat m2, Mat matOut) {
       if (this.needsBackpropagation) {
         //Delegate backward = MatOps.getDotBackprop(m1, m2, matOut);
-        GraphStack entry = new GraphStack(GraphOperations.Dot, m1, m2, matOut );
+        GraphStack entry = new GraphStack(GraphOperations.Dot, ref m1, ref m2, ref matOut );
         this.backpropagationStack.Add( entry );
       }
     }
@@ -240,7 +257,7 @@ namespace Recurrent{
     private void addEltmulToBackpropagationStack(Mat m1, Mat m2, Mat matOut) {
       if (this.needsBackpropagation) {
         //Delegate backward = MatOps.getEltmulBackprop(m1, m2, matOut);
-        GraphStack entry = new GraphStack(GraphOperations.ElementMultiply, m1, m2, matOut );
+        GraphStack entry = new GraphStack(GraphOperations.ElementMultiply, ref m1, ref m2, ref matOut );
         this.backpropagationStack.Add( entry );
       }
     }

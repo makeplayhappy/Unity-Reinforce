@@ -15,13 +15,13 @@ namespace Recurrent{
         matOut = m_out;
     }
 
-    public GraphStack(GraphOperations op, Mat m1_in, Mat m_out){
+    public GraphStack(GraphOperations op, ref Mat m1_in, ref Mat m_out){
         operation = op;
         m1 = m1_in;
         matOut = m_out;
     }
 
-    public GraphStack(GraphOperations op, Mat m1_in, Mat m2_in, Mat m_out){
+    public GraphStack(GraphOperations op, ref Mat m1_in, ref Mat m2_in, ref Mat m_out){
         operation = op;
         m1 = m1_in;
         m2 = m2_in;

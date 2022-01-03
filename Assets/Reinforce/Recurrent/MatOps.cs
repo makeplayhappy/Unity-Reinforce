@@ -82,7 +82,7 @@ namespace Recurrent{
 
     //public delegate void refMatMat(ref Mat m, Mat matOut);
 
-    public static void getTanhBackprop(ref Mat m, Mat matOut) {
+    public static void getTanhBackprop(ref Mat m, ref Mat matOut) {
  
         for (int i = 0; i < m.w.Length; i++) {
           // grad for z = tanh(x) is (1 - z^2)
@@ -110,7 +110,7 @@ namespace Recurrent{
       return 1.0f / (1f + Mathf.Exp(-x));
     }
 
-    public static void getSigmoidBackprop(ref Mat m, Mat matOut) {
+    public static void getSigmoidBackprop(ref Mat m, ref Mat matOut) {
 
         for (int i = 0; i < m.w.Length; i++) {
           // grad for z = tanh(x) is (1 - z^2)
@@ -132,7 +132,7 @@ namespace Recurrent{
       return matOut;
     }
 
-    public static void getReluBackprop(ref Mat m, Mat matOut) {
+    public static void getReluBackprop(ref Mat m, ref Mat matOut) {
 
         for (int i = 0; i < m.w.Length; i++) {
           m.dw[i] += (m.w[i] > 0f) ? matOut.dw[i] : 0.0f;
@@ -157,7 +157,7 @@ namespace Recurrent{
 
     //public delegate void refMatRefMatMat(ref Mat m1, ref Mat m2, Mat matOut);
 
-    public static void getAddBackprop(Mat m1, Mat m2, Mat matOut) {
+    public static void getAddBackprop(ref Mat m1, ref Mat m2, ref Mat matOut) {
       
         for (int i = 0; i < m1.w.Length; i++) {
           m1.dw[i] += matOut.dw[i];
@@ -188,7 +188,7 @@ namespace Recurrent{
       return matOut;
     }
 
-    public static void getMulBackprop(ref Mat m1, ref Mat m2, Mat matOut) {
+    public static void getMulBackprop(ref Mat m1, ref Mat m2, ref Mat matOut) {
 
         for (int i = 0; i < m1.rows; i++) {
           for (int j = 0; j < m2.cols; j++) {
@@ -220,7 +220,7 @@ namespace Recurrent{
       return matOut;
     }
 
-    public static void getDotBackprop(ref Mat m1 ,ref Mat m2, Mat matOut) {
+    public static void getDotBackprop(ref Mat m1 ,ref Mat m2, ref Mat matOut) {
 
         for (int i = 0; i < m1.w.Length; i++) {
           m1.dw[i] += m2.w[i] * matOut.dw[0];
@@ -246,7 +246,7 @@ namespace Recurrent{
     }
     //delegate void refMatRefMatMat(ref Mat m1, ref Mat m2, Mat matOut);
 
-    public static void getEltmulBackprop(ref Mat m1, ref Mat m2, Mat matOut) {
+    public static void getEltmulBackprop(ref Mat m1, ref Mat m2, ref Mat matOut) {
 
         for (int i = 0; i < m1.w.Length; i++) {
           m1.dw[i] += m2.w[i] * matOut.dw[i];

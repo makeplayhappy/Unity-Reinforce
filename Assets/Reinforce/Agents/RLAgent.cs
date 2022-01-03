@@ -13,13 +13,23 @@ import { DQNBrain } from './components/DQNBrain';
 import { Sensory } from './components/Sensory';
 import { WorldObject } from '../WorldObject';
 */
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
 namespace Reinforce{
-  public class RLAgent : IAgent {
+  public class RLAgent : MonoBehaviour, IAgent {
 
     //public readonly sensory: Sensory;
-    public readonly DQNBrain brain;
+    public DQNBrain brain;
 
     public int numberOfActions;
+
+    private List<Vector2> actions;
+
+    private float actionAngle = 2f; 
+    private float minActionAngle = -8f;
+    private float maxActionAngle = 8f;
 
     private int actionIndex;
 
@@ -29,9 +39,41 @@ namespace Reinforce{
 
     private float[] states;
 
+
+
+    public bool istraining = true;
+    int episodeCount;
+    
+    float episodeReward;
+    float reward;
+    public float rotationSpeed = 6f;
+
+    public GameObject ball;
+    public Text infoText;
+    private Transform ballTransform;
+    private Rigidbody ballRb;
+
+    public float timePerDecision = 0.3333f;
+    private float nextDecisionTime;
+
+    private Vector3 ballStartPosition;
+
+    private Quaternion wantedRotation;
+    private Quaternion startRotation;
+    private float lerpAmount = 1.01f;
+
+    public bool isTouching = false;
+    public Vector3 positionDelta;
+
+    public Vector2 actionOut = Vector2.zero;
+
+
+
+
     //private readonly velocityDiscountFactor: number = 0.95;
 
-    RLAgent(int id, DQNBrain brain) {
+    /*
+    public RLAgent(int id, DQNBrain brain) {
 
       //super(id, 3, 10, location, new Point2D(0, 0));
 
@@ -42,12 +84,46 @@ namespace Reinforce{
 
     }
 
-    RLAgent(int id) {
+    public RLAgent(int id) {
+      generateActions();
+      this.brain = createDefaultBrain();
+      this.actionIndex = 0;
+      this.reset();
+    }*/
+
+    void Awake(){
+      generateActions();
       this.brain = createDefaultBrain();
       this.actionIndex = 0;
       this.reset();
     }
 
+    void Start(){
+      ballTransform = ball.transform;
+      ballRb = ball.GetComponent<Rigidbody>();
+      ballStartPosition = ballTransform.position;
+      nextDecisionTime = Time.fixedTime + timePerDecision;
+    }
+
+
+
+    void Update(){
+      //observe and learn
+      if( lerpAmount <= 1f){
+
+            transform.rotation = Quaternion.Lerp(startRotation, wantedRotation, lerpAmount);
+            lerpAmount += Time.deltaTime * rotationSpeed;
+      }
+
+      positionDelta = ballTransform.position - transform.position;  
+
+        //check out of bounds
+		  if (positionDelta.y < -1.5f || Mathf.Abs(positionDelta.x) > 3.8f || Mathf.Abs(positionDelta.z) > 3.8f){
+        reward = -1f;
+        resetSimulation();
+        episodeCount++;
+      }
+    }
 
     //copied from RLAgentFactory
     private DQNBrain createDefaultBrain() {
@@ -76,11 +152,13 @@ namespace Reinforce{
     //copied from RLAgentFactory
     //placeholder for implementation
     private int determineNumberOfStates() {
+
       return 10;
     }
 
     public void reset() {
       this.totalReward = 0;
+      resetSimulation();
 
       //this.consumptionReward = 0;
       //this.sensoryReward = 0;
@@ -135,6 +213,18 @@ namespace Reinforce{
       //states.push(this.velocity.y);
 
       this.actionIndex = this.brain.decide(states);
+
+    }
+
+
+    private void generateActions(){
+      actions = new List<Vector2>();
+      //balancer has quantised position states -8 .. 8 degrees in X and Z rotations
+      for(float x = minActionAngle; x <= maxActionAngle; x = x+actionAngle ){
+        for(float z = minActionAngle; z <= maxActionAngle; z = z+actionAngle ){
+          actions.Add( new Vector2(x,z) );
+        }
+      }
 
     }
 
@@ -228,6 +318,31 @@ namespace Reinforce{
       }
     }
     */
+
+    private void resetSimulation(){
+
+        ballRb.velocity = new Vector3(0f, 0f, 0f);
+        ballTransform.position = new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f)) + ballStartPosition;    
+
+    }
+    void OnCollisionStay(Collision collisionInfo) {
+        if( collisionInfo.transform.tag == "Player" && !isTouching){
+            isTouching = true;
+        }
+    }
+
+    void OnCollisionExit(Collision collisionInfo) {
+        if( collisionInfo.transform.tag == "Player" && isTouching ){
+            isTouching = false;
+        }
+    }
+
+    void OnCollisionEnter(Collision collisionInfo) {
+        if( collisionInfo.transform.tag == "Player" ){
+            isTouching = true;
+        }
+    }
+
     /**
      * Learning
      */
