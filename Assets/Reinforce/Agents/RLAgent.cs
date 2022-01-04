@@ -35,9 +35,10 @@ namespace Reinforce{
 
     //private consumptionReward: number;
     //private sensoryReward: number;
-    private int totalReward;
+    private float totalReward;
 
     private float[] states;
+    private int numberStates = 8;
 
 
 
@@ -93,19 +94,40 @@ namespace Reinforce{
 
     void Awake(){
       generateActions();
+      states = new float[ numberStates ];
       this.brain = createDefaultBrain();
       this.actionIndex = 0;
-      this.reset();
+      
+      
     }
 
     void Start(){
       ballTransform = ball.transform;
       ballRb = ball.GetComponent<Rigidbody>();
       ballStartPosition = ballTransform.position;
-      nextDecisionTime = Time.fixedTime + timePerDecision;
+
+      this.reset();
+      
     }
 
+    void FixedUpdate(){
+        positionDelta = ballTransform.position - transform.position; 
 
+        if (positionDelta.y < -1.5f || Mathf.Abs(positionDelta.x) > 3.8f || Mathf.Abs(positionDelta.z) > 3.8f){
+          reward = -1f;
+          learn();
+          reset();
+          decide();
+          episodeCount++;
+
+        }else if( Time.fixedTime > nextDecisionTime && isTouching){
+            nextDecisionTime = Time.fixedTime + timePerDecision;
+            this.totalReward += getPositionReward();
+            learn();
+            decide();
+            
+        }
+    }
 
     void Update(){
       //observe and learn
@@ -114,21 +136,19 @@ namespace Reinforce{
             transform.rotation = Quaternion.Lerp(startRotation, wantedRotation, lerpAmount);
             lerpAmount += Time.deltaTime * rotationSpeed;
       }
+      //check out of bounds
+    }
 
-      positionDelta = ballTransform.position - transform.position;  
-
-        //check out of bounds
-		  if (positionDelta.y < -1.5f || Mathf.Abs(positionDelta.x) > 3.8f || Mathf.Abs(positionDelta.z) > 3.8f){
-        reward = -1f;
-        resetSimulation();
-        episodeCount++;
-      }
+    //distance from center reward
+    private float getPositionReward(){
+      reward = 0.01f + Mathf.Clamp(0.1f * (3f - Mathf.Sqrt(positionDelta.x*positionDelta.x+positionDelta.z*positionDelta.z)), 0f , 0.5f);
+      return reward;
     }
 
     //copied from RLAgentFactory
     private DQNBrain createDefaultBrain() {
-      int numberOfStates = this.determineNumberOfStates();
-      Environment env = new Environment(0, 0, numberOfStates, this.numberOfActions);
+      //int numberOfStates = this.determineNumberOfStates();
+      Environment env = new Environment(0, 0, this.numberStates, this.numberOfActions);
 
       DQNOpt opt = new DQNOpt();
       opt.setTrainingMode(true); // allows epsilon decay
@@ -149,20 +169,24 @@ namespace Reinforce{
       return brain;
     }
 
-    //copied from RLAgentFactory
-    //placeholder for implementation
+/*    //copied from RLAgentFactory
+    // number of float observations
     private int determineNumberOfStates() {
 
       return 10;
     }
-
+*/
     public void reset() {
-      this.totalReward = 0;
-      resetSimulation();
+      this.totalReward = 0f;
+      nextDecisionTime = Time.fixedTime + timePerDecision;
+      positionDelta = Vector3.zero;
 
       //this.consumptionReward = 0;
       //this.sensoryReward = 0;
       //this.sensory.reset();
+
+      ballRb.velocity = new Vector3(0f, 0f, 0f);
+      ballTransform.position = new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f)) + ballStartPosition;    
 
     }
 
@@ -185,7 +209,7 @@ namespace Reinforce{
 
     public void observe(float[] observations) {
 
-      states = observations;
+      //states = observations;
       /*
       this.sensory.process(world, this);
           *** this does: 
@@ -197,6 +221,25 @@ namespace Reinforce{
           ***
           */
 
+    }
+
+
+    // Collect the observations / sensors
+    private void observeStates(){
+
+      states[0] = Mathf.Clamp(transform.rotation.x, -1f, 1f);
+      states[1] = Mathf.Clamp(transform.rotation.z, -1f, -1f);
+
+      Vector3 normalisedPositionDelta = positionDelta * 0.3333f; // normalise to bounds is 3 so multiply by 1/3 = 0.3333
+      states[2] = Mathf.Clamp(positionDelta.x, -1f, 1f);
+      states[3] = Mathf.Clamp(positionDelta.y, -1f, 1f);
+      states[4] = Mathf.Clamp(positionDelta.z, -1f, 1f);
+
+      Vector3 normalisedVelo = ballRb.velocity * 0.2f; //assume a max velo of 5
+
+      states[5] = Mathf.Clamp(normalisedVelo.x, -1f, 1f);
+      states[6] = Mathf.Clamp(normalisedVelo.y, -1f, 1f);
+      states[7] = Mathf.Clamp(normalisedVelo.z, -1f, 1f);
     }
 
     /**
@@ -212,8 +255,28 @@ namespace Reinforce{
       //states.push(this.velocity.x);
       //states.push(this.velocity.y);
 
-      this.actionIndex = this.brain.decide(states);
+      observeStates();
 
+      actionIndex = brain.decide(states);
+
+      //run the new action index
+      
+      float degreeRotationRange = 8f;
+      Vector3 wanterEuler = new Vector3(actions[ actionIndex ][0] , 0, actions[ actionIndex ][1]);
+      wantedRotation.eulerAngles = wanterEuler;
+      lerpAmount = 0f;
+      startRotation = transform.rotation; 
+
+    }
+
+    /**
+     * Learning
+     */
+    public void learn() {
+      //this.processSensoryRewards();
+      //this.totalReward = this.consumptionReward + this.sensoryReward;
+      brain.learn( totalReward );
+      totalReward = 0f;
     }
 
 
@@ -225,6 +288,8 @@ namespace Reinforce{
           actions.Add( new Vector2(x,z) );
         }
       }
+
+      numberOfActions = actions.Count;
 
     }
 
@@ -319,12 +384,7 @@ namespace Reinforce{
     }
     */
 
-    private void resetSimulation(){
-
-        ballRb.velocity = new Vector3(0f, 0f, 0f);
-        ballTransform.position = new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f)) + ballStartPosition;    
-
-    }
+    
     void OnCollisionStay(Collision collisionInfo) {
         if( collisionInfo.transform.tag == "Player" && !isTouching){
             isTouching = true;
@@ -343,14 +403,7 @@ namespace Reinforce{
         }
     }
 
-    /**
-     * Learning
-     */
-    public void learn() {
-      //this.processSensoryRewards();
-      //this.totalReward = this.consumptionReward + this.sensoryReward;
-      this.brain.learn(this.totalReward);
-    }
+
 
     /**
      * Sensation-Rewards
