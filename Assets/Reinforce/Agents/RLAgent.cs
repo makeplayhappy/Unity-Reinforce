@@ -17,6 +17,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// This goes onto the agent controlled platform
+
 namespace Reinforce{
   public class RLAgent : MonoBehaviour, IAgent {
 
@@ -95,7 +97,7 @@ namespace Reinforce{
       generateActions();
       this.brain = createDefaultBrain();
       this.actionIndex = 0;
-      this.reset();
+      
     }
 
     void Start(){
@@ -103,6 +105,8 @@ namespace Reinforce{
       ballRb = ball.GetComponent<Rigidbody>();
       ballStartPosition = ballTransform.position;
       nextDecisionTime = Time.fixedTime + timePerDecision;
+
+      this.reset();
     }
 
 
@@ -159,6 +163,8 @@ namespace Reinforce{
     public void reset() {
       this.totalReward = 0;
       resetSimulation();
+
+      Debug.Log("Reset Sim, episodeCount: " + episodeCount );
 
       //this.consumptionReward = 0;
       //this.sensoryReward = 0;
