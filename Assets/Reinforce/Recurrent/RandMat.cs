@@ -8,8 +8,10 @@ namespace Recurrent{
     * @param std Standard deviation for initialization
     */
     public RandMat(int rows, int cols, float mu, float std) : base(rows, cols) {
-      
-      Utils.fillRandn(ref w, mu, std);
+
+      //Mat randMt = new Mat(rows, cols);
+      Utils.fillRandn(ref this.w, mu, std);
+
     }
   }
 }

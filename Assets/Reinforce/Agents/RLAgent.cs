@@ -127,6 +127,14 @@ namespace Reinforce{
         resetSimulation();
         episodeCount++;
       }
+
+      if( Time.fixedTime > nextDecisionTime && isTouching){
+        Debug.Log("Learn adn decide " + Time.fixedTime);
+        nextDecisionTime = Time.fixedTime + timePerDecision;
+        learn();
+        decide();
+            
+      }
     }
 
     //copied from RLAgentFactory
@@ -157,7 +165,7 @@ namespace Reinforce{
     //placeholder for implementation
     private int determineNumberOfStates() {
 
-      return 10;
+      return 8;
     }
 
     public void reset() {
@@ -189,9 +197,32 @@ namespace Reinforce{
       return this.brain.getEnv();
     }
 
-    public void observe(float[] observations) {
+    public void observe(float[] observation) {
+      //this.sensory.process(world, this);
+    }
 
-      states = observations;
+
+    private float[] collectObservations(){
+
+      float[] state = new float[8];
+
+
+      state[0] = Mathf.Clamp(transform.rotation.x, -1f, 1f);
+      state[1] = Mathf.Clamp(transform.rotation.z, -1f, -1f);
+
+      Vector3 normalisedPositionDelta = positionDelta * 0.3333f; // normalise to bounds is 3 so multiply by 1/3 = 0.3333
+      state[2] = Mathf.Clamp(positionDelta.x, -1f, 1f);
+      state[3] = Mathf.Clamp(positionDelta.y, -1f, 1f);
+      state[4] = Mathf.Clamp(positionDelta.z, -1f, 1f);
+      
+      Vector3 normalisedVelo = ballRb.velocity * 0.2f; //assume a max velo of 5
+
+      state[5] = Mathf.Clamp(normalisedVelo.x, -1f, 1f);
+      state[6] = Mathf.Clamp(normalisedVelo.y, -1f, 1f);
+      state[7] = Mathf.Clamp(normalisedVelo.z, -1f, 1f);
+
+      return state;
+
       /*
       this.sensory.process(world, this);
           *** this does: 
@@ -218,7 +249,12 @@ namespace Reinforce{
       //states.push(this.velocity.x);
       //states.push(this.velocity.y);
 
-      this.actionIndex = this.brain.decide(states);
+      this.actionIndex = this.brain.decide( collectObservations() );
+      Vector2 action = actions[ this.actionIndex ];
+      Vector3 wanterEuler = new Vector3(action.x, 0, action.y);
+      wantedRotation.eulerAngles = wanterEuler;
+      lerpAmount = 0f;
+      startRotation = transform.rotation;
 
     }
 
@@ -231,6 +267,8 @@ namespace Reinforce{
           actions.Add( new Vector2(x,z) );
         }
       }
+
+      numberOfActions = actions.Count;
 
     }
 
@@ -355,7 +393,9 @@ namespace Reinforce{
     public void learn() {
       //this.processSensoryRewards();
       //this.totalReward = this.consumptionReward + this.sensoryReward;
-      this.brain.learn(this.totalReward);
+      //distance from center reward
+      reward = 0.05f + Mathf.Clamp(0.1f * (3f - Mathf.Sqrt(positionDelta.x*positionDelta.x+positionDelta.z*positionDelta.z)), 0f , 0.5f);
+      this.brain.learn(reward);
     }
 
     /**

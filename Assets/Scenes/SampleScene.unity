@@ -581,7 +581,7 @@ MonoBehaviour:
   rotationSpeed: 6
   ball: {fileID: 1901048657}
   infoText: {fileID: 1737705143}
-  timePerDecision: 0.3333
+  timePerDecision: 0.5
   isTouching: 0
   positionDelta: {x: 0, y: 0, z: 0}
   actionOut: {x: 0, y: 0}
@@ -749,7 +749,7 @@ GameObject:
   - component: {fileID: 1901048658}
   m_Layer: 0
   m_Name: Ball
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
