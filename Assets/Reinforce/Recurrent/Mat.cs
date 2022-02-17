@@ -16,12 +16,25 @@ namespace Recurrent{
         * @param cols columns of Matrix
         */
         public Mat(int rowsIn, int colsIn) {
+
+            System.Diagnostics.Debug.Assert(rowsIn <= 0 || colsIn <= 0, "[class:Mat] constructor: zero setting row ("+rowsIn+") col ("+colsIn+")");
+
             //super();
             rows = rowsIn;
             cols = colsIn;
             this._length = rows * cols;
             this.w = Utils.zeros(this._length);
-            this.dw = Utils.zeros(this._length);
+            this.dw = Utils.zeros(this._length);// + cols);
+
+//m1 dw [ cols * rows + cols ]
+// md dw [ cols * m1.cols + cols]
+        }
+
+        public bool hasData(){
+            if(rows > 0 && cols > 0 && w.Length > 0 ){
+                return true;
+            }
+            return false;
         }
 
         /**

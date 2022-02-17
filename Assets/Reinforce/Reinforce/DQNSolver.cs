@@ -30,10 +30,11 @@ namespace Reinforce{
         private Net net;
         private Graph previousGraph;
         private SarsaExperience shortTermMemory;// = new SarsaExperience(){ s0: null, a0: null, r0: null, s1: null, a1: null };
-        private List<SarsaExperience> longTermMemory;
+        //private List<SarsaExperience> longTermMemory;
+        private SarsaExperience[] longTermMemory;
         private bool isInTrainingMode;
         private int learnTick;
-        private int memoryIndexTick;
+        private int memoryIndexTick = 0;
 
 
         public DQNSolver(Environment environ, DQNOpt option) : base( environ, option ) {
@@ -65,12 +66,13 @@ namespace Reinforce{
         }
 
         public override void reset() {
+
             this.numberOfHiddenUnits = this.opt.numberOfHiddenUnits;
             this.numberOfStates = this.env.numberOfStates;
             this.numberOfActions = this.env.numberOfActions;
 
-            NetOpts netOpts = new NetOpts(this.numberOfStates,this.numberOfHiddenUnits,this.numberOfActions);
-
+            NetOpts netOpts = new NetOpts(this.numberOfStates, this.numberOfHiddenUnits, this.numberOfActions);
+            Debug.Log("DQNSolver reset | numberOfHiddenUnits Length:" + numberOfHiddenUnits.Length + " first item:" + numberOfHiddenUnits[0]  );
             this.net = new Net(netOpts);
 
             this.learnTick = 0;
@@ -82,7 +84,7 @@ namespace Reinforce{
             this.shortTermMemory.s1 = null;
             this.shortTermMemory.a1 = null;
 
-            this.longTermMemory = new List<SarsaExperience>(); // could be new SarsaExperience[experienceSize]()
+            this.longTermMemory = new SarsaExperience[experienceSize]; //new List<SarsaExperience>(); // could be new SarsaExperience[experienceSize]()
         }
 
         /**
@@ -202,6 +204,10 @@ namespace Reinforce{
 
 
         protected Mat determineActionVector(Graph graph, Mat stateVector ) {
+            //stateVector is null
+            if( stateVector == null){
+                stateVector = new Mat(0,0);
+            }
             Mat a2mat = this.net.forward(stateVector, graph);
             this.backupGraph(graph); // back this up
             return a2mat;
@@ -249,25 +255,62 @@ namespace Reinforce{
         * @param {SarsaExperience} sarsa Object containing states, actions and reward of t & t-1
         */
         protected void learnFromSarsaTuple(SarsaExperience sarsa ) {
-            float q1Max = this.getTargetQ(sarsa.s1, sarsa.r0);
-            Mat q0ActionVector = this.backwardQ(sarsa.s0);
-            //float q0Max = 0f;
-            //if( sarsa.a0 != null){
-                float q0Max = q0ActionVector.w[(int)sarsa.a0];
-            //}
+            float q1Max = 0f;
+            if( sarsa!=null && sarsa.s1 != null &&  sarsa.s1.hasData() ){
+                q1Max = this.getTargetQ(sarsa.s1, sarsa.r0);
+            }
+            float q0Max = 0f;
+            Mat q0ActionVector = new Mat(0,0);
+
+            if( sarsa!=null && sarsa.s0 != null){
+
+                q0ActionVector = this.backwardQ(sarsa.s0);
+                
+                if( sarsa.a0 == null){
+                    q0Max = q0ActionVector.w[0];
+                }else{
+                    q0Max = q0ActionVector.w[(int)sarsa.a0];
+                }
+            }
 
             // Loss_i(w_i) = [(r0 + gamma * Q'(s',a') - Q(s,a)) ^ 2]
             float loss = q0Max - q1Max;
             loss = this.clipLoss(loss);
 
-            //if( sarsa.a0 != null){
+            if( sarsa!=null && sarsa.a0 != null){
                 q0ActionVector.dw[(int)sarsa.a0] = loss;
-            //}
-            this.previousGraph.backward();
+                
 
-            // discount all weights of net depending on their gradients
+            }
+            this.previousGraph.backward();
+            
+
+        // discount all weights of net depending on their gradients
             this.net.update(this.alpha);
+            
         }
+
+        /*
+
+   * Learn from sarsa tuple JS
+   * @param {SarsaExperience} sarsa Object containing states, actions and reward of t & t-1
+* /
+  protected learnFromSarsaTuple(sarsa: SarsaExperience): void {
+    const q1Max = this.getTargetQ(sarsa.s1, sarsa.r0);
+    const q0ActionVector = this.backwardQ(sarsa.s0);
+    const q0Max = q0ActionVector.w[sarsa.a0];
+
+    // Loss_i(w_i) = [(r0 + gamma * Q'(s',a') - Q(s,a)) ^ 2]
+    let loss = q0Max - q1Max;
+    loss = this.clipLoss(loss);
+
+    q0ActionVector.dw[sarsa.a0] = loss;
+    this.previousGraph.backward();
+
+    // discount all weights of net depending on their gradients
+    this.net.update(this.alpha);
+  }
+/*  */
 
         protected float getTargetQ(Mat s1 , float? r0) {
             //if(r0 == null){
@@ -304,7 +347,12 @@ namespace Reinforce{
         }
 
         protected void addShortTermToLongTermMemory() {
-            SarsaExperience sarsa = this.extractSarsaExperience();
+            
+            SarsaExperience sarsa = new SarsaExperience();
+            
+            if( this.shortTermMemory.s0 != null && this.shortTermMemory.s1 != null && this.shortTermMemory.s0.hasData() && this.shortTermMemory.s1.hasData() ){ 
+                sarsa = this.extractSarsaExperience();
+            }
             this.longTermMemory[this.memoryIndexTick] = sarsa;
             this.memoryIndexTick++;
             if (this.memoryIndexTick > this.experienceSize - 1) { // roll over
@@ -313,7 +361,7 @@ namespace Reinforce{
         }
 
         protected SarsaExperience extractSarsaExperience() {
-
+            
             Mat s0 = new Mat(this.shortTermMemory.s0.rows, this.shortTermMemory.s0.cols);
             s0.setFrom(this.shortTermMemory.s0.w);
             Mat s1 = new Mat(this.shortTermMemory.s1.rows, this.shortTermMemory.s1.cols);
@@ -325,6 +373,7 @@ namespace Reinforce{
                 this.shortTermMemory.r0,
                 s1,
                 this.shortTermMemory.a1);
+            
 
             return sarsa;
         }
@@ -334,7 +383,7 @@ namespace Reinforce{
         */
         protected void limitedSampledReplayLearning() {
             for (int i = 0; i < this.replaySteps; i++) {
-                int ri = Utils.randi(0, this.longTermMemory.Count); // todo: priority sweeps?
+                int ri = Utils.randi(0, this.longTermMemory.Length); // todo: priority sweeps?
                 SarsaExperience sarsa = this.longTermMemory[ri];
                 this.learnFromSarsaTuple(sarsa);
             }

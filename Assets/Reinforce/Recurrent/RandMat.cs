@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Recurrent{
     public class RandMat : Mat {
     /**
@@ -8,9 +10,12 @@ namespace Recurrent{
     * @param std Standard deviation for initialization
     */
     public RandMat(int rows, int cols, float mu, float std) : base(rows, cols) {
-
+      Debug.Log("RandMat constructor " + rows + " " + cols);
       //Mat randMt = new Mat(rows, cols);
-      Utils.fillRandn(ref this.w, mu, std);
+      Utils.fillRandn(ref w, mu, std);
+      Debug.Log(w.Length);
+      
+      
 
     }
   }

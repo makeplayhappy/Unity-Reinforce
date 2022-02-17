@@ -3,7 +3,7 @@
 namespace Reinforce{
   public class DQNOpt {
     public bool trainingMode = true;
-    public int[] numberOfHiddenUnits = new int[100];
+    public int[] numberOfHiddenUnits = new int[] { 100 };
     public float epsilonMax = 1.0f;
     public float epsilonMin = 0.1f;
     public int epsilonDecayPeriod = 1000000;// 1e6;
@@ -31,7 +31,9 @@ namespace Reinforce{
 
     public void setNumberOfHiddenUnits(int numberOfHiddenUnits) {
       // TODO: Add DNN support
-      this.numberOfHiddenUnits = new int[numberOfHiddenUnits];
+      this.numberOfHiddenUnits = new int[] { numberOfHiddenUnits };
+      //this.numberOfHiddenUnits = new int[numberOfHiddenUnits];
+      //this should be filled with something?
     }
 
     /**

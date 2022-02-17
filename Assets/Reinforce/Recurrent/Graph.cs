@@ -2,6 +2,7 @@
 //import { MatOps } from './utils/mat-ops';
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Recurrent{
 
@@ -163,13 +164,25 @@ namespace Recurrent{
         case GraphOperations.Multiply:
 
           //MatOps.getMulBackprop(ref entry.m1, ref entry.m2, ref entry.matOut);
+          if( entry.m1 == null || entry.m2 == null ){
+            break;
+          }
+
 
           for (int i = 0; i < entry.m1.rows; i++) {
             for (int j = 0; j < entry.m2.cols; j++) {
               for (int k = 0; k < entry.m1.cols; k++) {
                 float b = entry.matOut.dw[entry.m2.cols * i + j];
-                entry.m1.dw[entry.m1.cols * i + k] += entry.m2.w[m2.cols * k + j] * b;
-                entry.m2.dw[entry.m2.cols * k + j] += entry.m1.w[m1.cols * i + k] * b;
+
+              //  int ind1 = entry.m1.cols * i + k;
+              //  int ind2 = entry.m2.cols * k + j;
+              //Debug.Log("indexes" + ind1 + " " + ind2 );
+              //  Debug.Log( entry.m1.dw.Length );
+              //  Debug.Log( entry.m2.w.Length );
+               // Debug.Log( entry.m1.hasData());
+                //Debug.Log( entry.m2.hasData() );
+                entry.m1.dw[entry.m1.cols * i + k] += entry.m2.w[entry.m2.cols * k + j] * b;
+                entry.m2.dw[entry.m2.cols * k + j] += entry.m1.w[entry.m1.cols * i + k] * b;
               }
             }
           }

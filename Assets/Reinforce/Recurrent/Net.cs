@@ -1,5 +1,5 @@
 //import { Mat, RandMat, Graph, NetOpts } from '.';
-
+using UnityEngine;
 
 namespace Recurrent{
   public class Net : NetOpts {
@@ -103,6 +103,12 @@ namespace Recurrent{
     * @returns output of type `Mat`
     */
     public Mat forward(Mat state, Graph graph ) {
+// state is null
+//Debug.Log("Net forward");
+//Debug.Log("W1.w.Length" + this.W1.w.Length);
+//Debug.Log("state.w.Length" + state.w.Length);
+
+
       Mat weightedInput = graph.mul(this.W1, state);
 
       Mat a1mat = graph.add(weightedInput, this.b1);

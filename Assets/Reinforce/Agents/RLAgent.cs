@@ -97,8 +97,8 @@ namespace Reinforce{
     void Awake(){
       generateActions();
       states = new float[ numberStates ];
-      this.brain = createDefaultBrain();
-      this.actionIndex = 0;
+      brain = createDefaultBrain();
+      actionIndex = 0;
       
     }
 
@@ -107,15 +107,16 @@ namespace Reinforce{
       ballRb = ball.GetComponent<Rigidbody>();
       ballStartPosition = ballTransform.position;
       nextDecisionTime = Time.fixedTime + timePerDecision;
-      this.reset();
+      reset();
     }
 
+/*
     void FixedUpdate(){
         positionDelta = ballTransform.position - transform.position; 
 
         if (positionDelta.y < -1.5f || Mathf.Abs(positionDelta.x) > 3.8f || Mathf.Abs(positionDelta.z) > 3.8f){
           reward = -1f;
-          learn();
+          learn(reward);
           reset();
           decide();
           episodeCount++;
@@ -123,34 +124,35 @@ namespace Reinforce{
         }else if( Time.fixedTime > nextDecisionTime && isTouching){
             nextDecisionTime = Time.fixedTime + timePerDecision;
             this.totalReward += getPositionReward();
-            learn();
+            learn( this.totalReward );
             decide();
             
         }
     }
-
+*/
     void Update(){
       //observe and learn
       if( lerpAmount <= 1f){
-
             transform.rotation = Quaternion.Lerp(startRotation, wantedRotation, lerpAmount);
             lerpAmount += Time.deltaTime * rotationSpeed;
       }
-      //check out of bounds
     
-      positionDelta = ballTransform.position - transform.position;  
+      positionDelta = ballTransform.position - transform.position; 
 
-        //check out of bounds
+      //check out of bounds
 		  if (positionDelta.y < -1.5f || Mathf.Abs(positionDelta.x) > 3.8f || Mathf.Abs(positionDelta.z) > 3.8f){
-        reward = -1f;
-        resetSimulation();
-        episodeCount++;
-      }
 
-      if( Time.fixedTime > nextDecisionTime && isTouching){
-        Debug.Log("Learn adn decide " + Time.fixedTime);
+        learn( -1f );
+        reset();
+        decide();
+        episodeCount++;
+
+
+      }else if( Time.fixedTime > nextDecisionTime && isTouching){
+
+        Debug.Log("Learn and decide " + Time.fixedTime);
         nextDecisionTime = Time.fixedTime + timePerDecision;
-        learn();
+        learn( getPositionReward() );
         decide();
             
       }
@@ -195,7 +197,7 @@ namespace Reinforce{
     }
 */
     public void reset() {
-      this.totalReward = 0f;
+      totalReward = 0f;
       nextDecisionTime = Time.fixedTime + timePerDecision;
       positionDelta = Vector3.zero;
 
@@ -211,22 +213,24 @@ namespace Reinforce{
     }
 
     public void load(string brainState) {
-      this.brain.load(brainState);
+      brain.load(brainState);
     }
 
     public void setTrainingModeTo(bool trainingMode) {
-      this.brain.setTrainingModeTo(trainingMode);
+      brain.setTrainingModeTo(trainingMode);
     }
 
 
     public DQNOpt getOpt() {
-      return this.brain.getOpt();
+      return brain.getOpt();
     }
 
     public Environment getEnv() {
-      return this.brain.getEnv();
+      return brain.getEnv();
     }
 
+
+    // Unused -- in js this was used to collect all the world observations together
     public void observe(float[] observation) {
       //this.sensory.process(world, this);
     }
@@ -282,8 +286,9 @@ namespace Reinforce{
       //states.push(this.velocity.y);
 
 
+      //this sets a new action and sets up the lerp to be picked up in the update loop which moves the platform into the decided actions position
       actionIndex = brain.decide( collectObservations() );
-      Vector2 action = actions[ this.actionIndex ];
+      Vector2 action = actions[ actionIndex ];
       Vector3 wanterEuler = new Vector3(action.x, 0, action.y);
       wantedRotation.eulerAngles = wanterEuler;
       lerpAmount = 0f;
@@ -295,11 +300,11 @@ namespace Reinforce{
     /**
      * Learning
      */
-    public void learn() {
+    public void learn( float reward) {
       //this.processSensoryRewards();
       //this.totalReward = this.consumptionReward + this.sensoryReward;
-      brain.learn( totalReward );
-      totalReward = 0f;
+      brain.learn( reward );
+
     }
 
 
@@ -430,14 +435,7 @@ namespace Reinforce{
     /**
      * Learning
      */
-    public void learn() {
-      //this.processSensoryRewards();
-      //this.totalReward = this.consumptionReward + this.sensoryReward;
-      //distance from center reward
 
-      brain.learn( getPositionReward() );
-      
-    }
 
     /**
      * Sensation-Rewards

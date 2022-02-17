@@ -11,7 +11,7 @@ namespace Reinforce{
     void observe(float[] observations); //CollectObservations
     void decide();
     //void act(World world);
-    void learn();
+    void learn(float reward);
     /**
      * Get rewards from collision and return true if collided.
      * @param Item to be evaluated
