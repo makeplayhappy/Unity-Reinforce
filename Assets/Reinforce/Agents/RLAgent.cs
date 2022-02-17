@@ -37,9 +37,10 @@ namespace Reinforce{
 
     //private consumptionReward: number;
     //private sensoryReward: number;
-    private int totalReward;
+    private float totalReward;
 
     private float[] states;
+    private int numberStates = 8;
 
 
 
@@ -95,6 +96,7 @@ namespace Reinforce{
 
     void Awake(){
       generateActions();
+      states = new float[ numberStates ];
       this.brain = createDefaultBrain();
       this.actionIndex = 0;
       
@@ -105,11 +107,27 @@ namespace Reinforce{
       ballRb = ball.GetComponent<Rigidbody>();
       ballStartPosition = ballTransform.position;
       nextDecisionTime = Time.fixedTime + timePerDecision;
-
       this.reset();
     }
 
+    void FixedUpdate(){
+        positionDelta = ballTransform.position - transform.position; 
 
+        if (positionDelta.y < -1.5f || Mathf.Abs(positionDelta.x) > 3.8f || Mathf.Abs(positionDelta.z) > 3.8f){
+          reward = -1f;
+          learn();
+          reset();
+          decide();
+          episodeCount++;
+
+        }else if( Time.fixedTime > nextDecisionTime && isTouching){
+            nextDecisionTime = Time.fixedTime + timePerDecision;
+            this.totalReward += getPositionReward();
+            learn();
+            decide();
+            
+        }
+    }
 
     void Update(){
       //observe and learn
@@ -118,7 +136,8 @@ namespace Reinforce{
             transform.rotation = Quaternion.Lerp(startRotation, wantedRotation, lerpAmount);
             lerpAmount += Time.deltaTime * rotationSpeed;
       }
-
+      //check out of bounds
+    
       positionDelta = ballTransform.position - transform.position;  
 
         //check out of bounds
@@ -137,10 +156,17 @@ namespace Reinforce{
       }
     }
 
+    //distance from center reward
+    private float getPositionReward(){
+      reward = 0.01f + Mathf.Clamp(0.1f * (3f - Mathf.Sqrt(positionDelta.x*positionDelta.x+positionDelta.z*positionDelta.z)), 0f , 0.5f);
+      return reward;
+
+    }
+
     //copied from RLAgentFactory
     private DQNBrain createDefaultBrain() {
-      int numberOfStates = this.determineNumberOfStates();
-      Environment env = new Environment(0, 0, numberOfStates, this.numberOfActions);
+      //int numberOfStates = this.determineNumberOfStates();
+      Environment env = new Environment(0, 0, this.numberStates, this.numberOfActions);
 
       DQNOpt opt = new DQNOpt();
       opt.setTrainingMode(true); // allows epsilon decay
@@ -161,22 +187,26 @@ namespace Reinforce{
       return brain;
     }
 
-    //copied from RLAgentFactory
-    //placeholder for implementation
+/*    //copied from RLAgentFactory
+    // number of float observations
     private int determineNumberOfStates() {
 
       return 8;
     }
-
+*/
     public void reset() {
-      this.totalReward = 0;
-      resetSimulation();
+      this.totalReward = 0f;
+      nextDecisionTime = Time.fixedTime + timePerDecision;
+      positionDelta = Vector3.zero;
 
       Debug.Log("Reset Sim, episodeCount: " + episodeCount );
 
       //this.consumptionReward = 0;
       //this.sensoryReward = 0;
       //this.sensory.reset();
+
+      ballRb.velocity = new Vector3(0f, 0f, 0f);
+      ballTransform.position = new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f)) + ballStartPosition;    
 
     }
 
@@ -206,7 +236,6 @@ namespace Reinforce{
 
       float[] state = new float[8];
 
-
       state[0] = Mathf.Clamp(transform.rotation.x, -1f, 1f);
       state[1] = Mathf.Clamp(transform.rotation.z, -1f, -1f);
 
@@ -223,6 +252,8 @@ namespace Reinforce{
 
       return state;
 
+      //states = observations;
+
       /*
       this.sensory.process(world, this);
           *** this does: 
@@ -235,6 +266,7 @@ namespace Reinforce{
           */
 
     }
+
 
     /**
      * Make a decision based on SensoryState 
@@ -249,13 +281,25 @@ namespace Reinforce{
       //states.push(this.velocity.x);
       //states.push(this.velocity.y);
 
-      this.actionIndex = this.brain.decide( collectObservations() );
+
+      actionIndex = brain.decide( collectObservations() );
       Vector2 action = actions[ this.actionIndex ];
       Vector3 wanterEuler = new Vector3(action.x, 0, action.y);
       wantedRotation.eulerAngles = wanterEuler;
       lerpAmount = 0f;
       startRotation = transform.rotation;
 
+
+    }
+
+    /**
+     * Learning
+     */
+    public void learn() {
+      //this.processSensoryRewards();
+      //this.totalReward = this.consumptionReward + this.sensoryReward;
+      brain.learn( totalReward );
+      totalReward = 0f;
     }
 
 
@@ -363,12 +407,7 @@ namespace Reinforce{
     }
     */
 
-    private void resetSimulation(){
-
-        ballRb.velocity = new Vector3(0f, 0f, 0f);
-        ballTransform.position = new Vector3(Random.Range(-1.5f, 1.5f), 0f, Random.Range(-1.5f, 1.5f)) + ballStartPosition;    
-
-    }
+    
     void OnCollisionStay(Collision collisionInfo) {
         if( collisionInfo.transform.tag == "Player" && !isTouching){
             isTouching = true;
@@ -387,6 +426,7 @@ namespace Reinforce{
         }
     }
 
+
     /**
      * Learning
      */
@@ -394,8 +434,9 @@ namespace Reinforce{
       //this.processSensoryRewards();
       //this.totalReward = this.consumptionReward + this.sensoryReward;
       //distance from center reward
-      reward = 0.05f + Mathf.Clamp(0.1f * (3f - Mathf.Sqrt(positionDelta.x*positionDelta.x+positionDelta.z*positionDelta.z)), 0f , 0.5f);
-      this.brain.learn(reward);
+
+      brain.learn( getPositionReward() );
+      
     }
 
     /**

@@ -178,11 +178,11 @@ namespace Recurrent{
       Mat matOut = new Mat(m1.rows, m2.cols);
       for (int row = 0; row < m1.rows; row++) { // loop over rows of m1
         for (int col = 0; col < m2.cols; col++) { // loop over cols of m2
-          float dot = 0.0f;
+          float dott = 0.0f;
           for (int k = 0; k < m1.cols; k++) { // dot product loop
-            dot += m1.w[m1.cols * row + k] * m2.w[m2.cols * k + col];
+            dott += m1.w[m1.cols * row + k] * m2.w[m2.cols * k + col];
           }
-          matOut.w[m2.cols * row + col] = dot;
+          matOut.w[m2.cols * row + col] = dott;
         }
       }
       return matOut;
@@ -212,11 +212,11 @@ namespace Recurrent{
       //Mat.assert(m1.w.Length === m2.w.Length && m1.rows === m2.rows, '[class:MatOps] dot: dimensions misaligned');
       System.Diagnostics.Debug.Assert(m1.w.Length == m2.w.Length && m1.rows == m2.rows, "[class:MatOps] dot: dimensions misaligned");
       Mat matOut = new Mat(1, 1);
-      float dot = 0.0f;
+      float dott = 0.0f;
       for (int i = 0; i < m1.w.Length; i++) {
-        dot += m1.w[i] * m2.w[i];
+        dott += m1.w[i] * m2.w[i];
       }
-      matOut.w[0] = dot;
+      matOut.w[0] = dott;
       return matOut;
     }
 
