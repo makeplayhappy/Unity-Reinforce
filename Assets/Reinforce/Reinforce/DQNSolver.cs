@@ -206,6 +206,7 @@ namespace Reinforce{
         protected Mat determineActionVector(Graph graph, Mat stateVector ) {
             //stateVector is null
             if( stateVector == null){
+                Debug.Log("stateVector is null");
                 stateVector = new Mat(0,0);
             }
             Mat a2mat = this.net.forward(stateVector, graph);
@@ -231,6 +232,7 @@ namespace Reinforce{
         */
         public override void learn(float r) {
             if (this.shortTermMemory.r0 != null && this.alpha > 0) {
+                Debug.Log("learn learnFromSarsaTuple");
                 this.learnFromSarsaTuple(this.shortTermMemory);
                 this.addToReplayMemory();
                 this.limitedSampledReplayLearning();
@@ -257,7 +259,10 @@ namespace Reinforce{
         protected void learnFromSarsaTuple(SarsaExperience sarsa ) {
             float q1Max = 0f;
             if( sarsa!=null && sarsa.s1 != null &&  sarsa.s1.hasData() ){
+
                 q1Max = this.getTargetQ(sarsa.s1, sarsa.r0);
+            }else{
+                Debug.Log("learnFromSarsaTuple sarsa is null");
             }
             float q0Max = 0f;
             Mat q0ActionVector = new Mat(0,0);
@@ -352,6 +357,8 @@ namespace Reinforce{
             
             if( this.shortTermMemory.s0 != null && this.shortTermMemory.s1 != null && this.shortTermMemory.s0.hasData() && this.shortTermMemory.s1.hasData() ){ 
                 sarsa = this.extractSarsaExperience();
+            }else{
+                Debug.Log("addShortTermToLongTermMemory shortTermMemory is null");
             }
             this.longTermMemory[this.memoryIndexTick] = sarsa;
             this.memoryIndexTick++;
@@ -385,6 +392,7 @@ namespace Reinforce{
             for (int i = 0; i < this.replaySteps; i++) {
                 int ri = Utils.randi(0, this.longTermMemory.Length); // todo: priority sweeps?
                 SarsaExperience sarsa = this.longTermMemory[ri];
+                Debug.Log("limitedSampledReplayLearning");
                 this.learnFromSarsaTuple(sarsa);
             }
         }
