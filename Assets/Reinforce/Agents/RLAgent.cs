@@ -29,7 +29,7 @@ namespace Reinforce{
 
     private List<Vector2> actions;
 
-    private float actionAngle = 2f; 
+    private float actionAngle = 4f; 
     private float minActionAngle = -8f;
     private float maxActionAngle = 8f;
 
@@ -45,10 +45,8 @@ namespace Reinforce{
 
 
     public bool istraining = true;
-    int episodeCount;
-    
-    float episodeReward;
-    float reward;
+    public int episodeCount;
+    public float reward;
     public float rotationSpeed = 6f;
 
     public GameObject ball;
@@ -68,7 +66,6 @@ namespace Reinforce{
     public bool isTouching = false;
     public Vector3 positionDelta;
 
-    public Vector2 actionOut = Vector2.zero;
 
 
 
@@ -150,7 +147,7 @@ namespace Reinforce{
 
       }else if( Time.fixedTime > nextDecisionTime && isTouching){
 
-        Debug.Log("Learn and decide " + Time.fixedTime);
+        //Debug.Log("Learn and decide " + Time.fixedTime);
         nextDecisionTime = Time.fixedTime + timePerDecision;
         learn( getPositionReward() );
         decide();
@@ -172,8 +169,8 @@ namespace Reinforce{
 
       DQNOpt opt = new DQNOpt();
       opt.setTrainingMode(true); // allows epsilon decay
-      opt.setNumberOfHiddenUnits(100); // number of neurons in hidden layer
-      opt.setEpsilonDecay(1.0f, 0.1f, 1000000); // initial epsilon for epsilon-greedy policy, 
+      opt.setNumberOfHiddenUnits(80);//100); // number of neurons in hidden layer
+      opt.setEpsilonDecay(1.0f, 0.1f, 10000); // 1000000 initial epsilon for epsilon-greedy policy, 
       opt.setEpsilon(0.05f); // initial epsilon for epsilon-greedy policy, 
       opt.setGamma(0.9f);
       opt.setAlpha(0.005f); // value function learning rate
@@ -181,7 +178,7 @@ namespace Reinforce{
       opt.setLossClamp(1.0f); // for robustness
       opt.setRewardClipping(true); // initial epsilon for epsilon-greedy policy, 
       opt.setRewardClamp(1.0f); // initial epsilon for epsilon-greedy policy, 
-      opt.setExperienceSize(1000000); //1e6 // size of experience
+      opt.setExperienceSize(10000);//1000000); //1e6 // size of experience
       opt.setReplayInterval(5); // number of time steps before we add another experience to replay memory
       opt.setReplaySteps(5);
       // outfit brain with environment complexity and specs
@@ -201,7 +198,7 @@ namespace Reinforce{
       nextDecisionTime = Time.fixedTime + timePerDecision;
       positionDelta = Vector3.zero;
 
-      Debug.Log("Reset Sim, episodeCount: " + episodeCount );
+      //Debug.Log("Reset Sim, episodeCount: " + episodeCount );
 
       //this.consumptionReward = 0;
       //this.sensoryReward = 0;
