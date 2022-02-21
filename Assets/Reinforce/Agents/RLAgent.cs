@@ -179,7 +179,7 @@ namespace Reinforce{
       opt.setRewardClipping(true); // initial epsilon for epsilon-greedy policy, 
       opt.setRewardClamp(1.0f); // initial epsilon for epsilon-greedy policy, 
       opt.setExperienceSize(10000);//1000000); //1e6 // size of experience
-      opt.setReplayInterval(5); // number of time steps before we add another experience to replay memory
+      opt.setReplayInterval(25); // number of time steps before we add another experience to replay memory
       opt.setReplaySteps(5);
       // outfit brain with environment complexity and specs
       DQNBrain brain = new DQNBrain(env, opt);
@@ -240,7 +240,7 @@ namespace Reinforce{
       state[0] = Mathf.Clamp(transform.rotation.x, -1f, 1f);
       state[1] = Mathf.Clamp(transform.rotation.z, -1f, -1f);
 
-      Vector3 normalisedPositionDelta = positionDelta * 0.3333f; // normalise to bounds is 3 so multiply by 1/3 = 0.3333
+      Vector3 normalisedPositionDelta = positionDelta * 0.25f; // normalise to bounds is 4 so multiply by 1/4 = 0.3333
       state[2] = Mathf.Clamp(positionDelta.x, -1f, 1f);
       state[3] = Mathf.Clamp(positionDelta.y, -1f, 1f);
       state[4] = Mathf.Clamp(positionDelta.z, -1f, 1f);

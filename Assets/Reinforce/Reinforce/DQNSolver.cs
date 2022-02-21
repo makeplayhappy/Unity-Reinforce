@@ -72,7 +72,7 @@ namespace Reinforce{
             this.numberOfActions = this.env.numberOfActions;
 
             NetOpts netOpts = new NetOpts(this.numberOfStates, this.numberOfHiddenUnits, this.numberOfActions);
-            Debug.Log("DQNSolver reset | numberOfHiddenUnits Length:" + numberOfHiddenUnits.Length + " first item:" + numberOfHiddenUnits[0]  );
+            //Debug.Log("DQNSolver reset | numberOfHiddenUnits Length:" + numberOfHiddenUnits.Length + " first item:" + numberOfHiddenUnits[0]  );
             this.net = new Net(netOpts);
 
             this.learnTick = 0;
@@ -140,6 +140,16 @@ namespace Reinforce{
         * @returns index of argmax action
         */
         public override int decide(float[] state) {
+
+/*
+            Debug.Log(" ** decide ** ");
+            Debug.Log("numberOfStates: " + numberOfStates + " state array length: " + state.Length );
+            string stateInfo = "";
+            for(int i=0;i<state.Length;i++){
+                stateInfo += i + ":" + state[i] + ", ";
+            }
+            Debug.Log(stateInfo);
+*/
             Mat stateVector = new Mat(this.numberOfStates, 1);
 
             stateVector.setFrom(state);
@@ -206,8 +216,8 @@ namespace Reinforce{
         protected Mat determineActionVector(Graph graph, Mat stateVector ) {
             //stateVector is null
             if( stateVector == null){
-                Debug.Log("stateVector is null");
-                stateVector = new Mat(0,0);
+                //Debug.Log("stateVector is null");
+                stateVector = new Mat(1,1);
             }
             Mat a2mat = this.net.forward(stateVector, graph);
             this.backupGraph(graph); // back this up
@@ -219,7 +229,11 @@ namespace Reinforce{
             this.previousGraph = graph;
         }
 
+        //Called from decide() 
+        //stateVector is the observations
+        //actionIndex is the last played action
         protected void shiftStateMemory(Mat stateVector, int actionIndex) {
+            //Debug.Log("shiftStateMemory actionindex: " + actionIndex );
             this.shortTermMemory.s0 = this.shortTermMemory.s1;
             this.shortTermMemory.a0 = this.shortTermMemory.a1;
             this.shortTermMemory.s1 = stateVector;
@@ -231,11 +245,14 @@ namespace Reinforce{
         * @param r current reward passed to learn
         */
         public override void learn(float r) {
+            //Debug.Log("learn r:" + r);
             if (this.shortTermMemory.r0 != null && this.alpha > 0) {
-                Debug.Log("learn learnFromSarsaTuple");
-                this.learnFromSarsaTuple(this.shortTermMemory);
+                //Debug.Log("learn learnFromSarsaTuple");
+                this.learnFromSarsaTuple(this.shortTermMemory); //this is okay 
                 this.addToReplayMemory();
-                this.limitedSampledReplayLearning();
+                // this is always null until the longterm memory fills up
+                // it picks a random entry from the long term memory to learn from
+                this.limitedSampledReplayLearning(); 
             }
             this.shiftRewardIntoMemory(r);
         }
@@ -258,24 +275,30 @@ namespace Reinforce{
         */
         protected void learnFromSarsaTuple(SarsaExperience sarsa ) {
             float q1Max = 0f;
-            if( sarsa!=null && sarsa.s1 != null &&  sarsa.s1.hasData() ){
+            if( sarsa != null && sarsa.s1 != null &&  sarsa.s1.hasData() ){
 
                 q1Max = this.getTargetQ(sarsa.s1, sarsa.r0);
             }else{
-                Debug.Log("learnFromSarsaTuple sarsa is null");
+                //Debug.Log("learnFromSarsaTuple sarsa is null");
             }
-            float q0Max = 0f;
-            Mat q0ActionVector = new Mat(0,0);
 
-            if( sarsa!=null && sarsa.s0 != null){
+            float q0Max = 0f;
+            Mat q0ActionVector = new Mat(1,1);
+
+            if( sarsa != null && sarsa.s0 != null){
 
                 q0ActionVector = this.backwardQ(sarsa.s0);
                 
-                if( sarsa.a0 == null){
+                if( sarsa.a0 != null && (int)sarsa.a0 < q0ActionVector.w.Length){
+                    q0Max = q0ActionVector.w[(int)sarsa.a0];
+                }else if( q0ActionVector.w.Length > 0 ){
                     q0Max = q0ActionVector.w[0];
                 }else{
-                    q0Max = q0ActionVector.w[(int)sarsa.a0];
+                    //Debug.Log("Q0AV.w length:" + q0ActionVector.w.Length + " Sa0:" + (int)sarsa.a0);
+                    return;
                 }
+            }else{
+                return;
             }
 
             // Loss_i(w_i) = [(r0 + gamma * Q'(s',a') - Q(s,a)) ^ 2]
@@ -345,6 +368,7 @@ namespace Reinforce{
         }
 
         protected void addToReplayMemory() {
+
             if (this.learnTick % this.keepExperienceInterval == 0) {
                 this.addShortTermToLongTermMemory();
             }
@@ -352,14 +376,10 @@ namespace Reinforce{
         }
 
         protected void addShortTermToLongTermMemory() {
-            
+            //Debug.Log("addShortTermToLongTermMemory");
             SarsaExperience sarsa = new SarsaExperience();
-            
-            if( this.shortTermMemory.s0 != null && this.shortTermMemory.s1 != null && this.shortTermMemory.s0.hasData() && this.shortTermMemory.s1.hasData() ){ 
-                sarsa = this.extractSarsaExperience();
-            }else{
-                Debug.Log("addShortTermToLongTermMemory shortTermMemory is null");
-            }
+            sarsa = this.extractSarsaExperience();
+
             this.longTermMemory[this.memoryIndexTick] = sarsa;
             this.memoryIndexTick++;
             if (this.memoryIndexTick > this.experienceSize - 1) { // roll over
@@ -368,12 +388,24 @@ namespace Reinforce{
         }
 
         protected SarsaExperience extractSarsaExperience() {
-            
-            Mat s0 = new Mat(this.shortTermMemory.s0.rows, this.shortTermMemory.s0.cols);
-            s0.setFrom(this.shortTermMemory.s0.w);
-            Mat s1 = new Mat(this.shortTermMemory.s1.rows, this.shortTermMemory.s1.cols);
-            s1.setFrom(this.shortTermMemory.s1.w);
+            Mat s0;
+            Mat s1;
 
+            if( this.shortTermMemory.s0 != null ){
+                s0 = new Mat(this.shortTermMemory.s0.rows, this.shortTermMemory.s0.cols);
+                s0.setFrom(this.shortTermMemory.s0.w);
+            }else{
+                s0 = new Mat(0,0);
+            }
+            
+            if( this.shortTermMemory.s1 != null ){
+                s1 = new Mat(this.shortTermMemory.s1.rows, this.shortTermMemory.s1.cols);
+                s1.setFrom(this.shortTermMemory.s1.w);
+            }else{
+                s1 = new Mat(0,0);
+            }
+
+            
             SarsaExperience sarsa = new SarsaExperience(
                 s0,
                 this.shortTermMemory.a0,
@@ -389,12 +421,21 @@ namespace Reinforce{
         * Sample some additional experience (minibatches) from replay memory and learn from it
         */
         protected void limitedSampledReplayLearning() {
-            for (int i = 0; i < this.replaySteps; i++) {
-                int ri = Utils.randi(0, this.longTermMemory.Length); // todo: priority sweeps?
-                SarsaExperience sarsa = this.longTermMemory[ri];
-                Debug.Log("limitedSampledReplayLearning");
-                this.learnFromSarsaTuple(sarsa);
+
+            //in c# I'm creating the LTM as an pre set array, in JS it adds on new one - 
+            // either recode and use a list or use this.memoryIndexTick for the same indexs
+            if( memoryIndexTick > 0 && memoryIndexTick > replaySteps ){
+                for (int i = 0; i < this.replaySteps; i++) {
+                    //int ri = Utils.randi(0, this.longTermMemory.Length); // todo: priority sweeps?
+                    int ri = Utils.randi(0, this.memoryIndexTick - 1);
+                    if(ri < this.longTermMemory.Length){
+                        SarsaExperience sarsa = this.longTermMemory[ri];
+                        //Debug.Log("limitedSampledReplayLearning (" + i + ")");
+                        this.learnFromSarsaTuple(sarsa);
+                    }
+                }
             }
+
         }
         
     }
